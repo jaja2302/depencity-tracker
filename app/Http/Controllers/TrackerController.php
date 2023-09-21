@@ -12,4 +12,10 @@ class TrackerController extends Controller
         // Your dashboard logic goes here
         return view('Tracking.dashboard');
     }
+
+    public function info()
+    {
+
+        return view('Tracking.info');
+    }
 }
