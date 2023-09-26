@@ -238,14 +238,17 @@ class TrackerController extends Controller
                 $plot_kuning = DB::connection('mysql2')
                     ->table('deficiency_tracker')
                     ->select('deficiency_tracker.*')
+                    ->join('afdeling', 'afdeling.nama', '=', 'deficiency_tracker.afd')
                     ->where('deficiency_tracker.est', '=', $estate)
-                    ->where('deficiency_tracker.afd', '=', $afdeling)
+                    ->where('afdeling.id', '=', $afdeling)
                     // ->whereNotIn('id', [353])
                     ->orderBy('id', 'desc') // Sort by 'id' column in descending order
                     ->get();
 
                 $plot_kuning = $plot_kuning->groupBy(['est']);
                 $plot_kuning = json_decode($plot_kuning, true);
+
+                // dd($plot_kuning, $afdeling);
 
                 $arrView['blok'] = $plotAfd;
                 $arrView['pokok'] = $plot_kuning;
@@ -270,7 +273,7 @@ class TrackerController extends Controller
                     ->table('deficiency_tracker')
                     ->select('deficiency_tracker.*')
                     ->where('deficiency_tracker.est', '=', $estate)
-                    ->where('deficiency_tracker.afd', '=', $afdeling)
+                    // ->where('deficiency_tracker.afd', '=', $afdeling)
                     ->where('deficiency_tracker.blok', 'LIKE', '%' . $blok . '%') // Use LIKE with % to match partial strings
                     ->orderBy('id', 'desc')
                     ->get();
@@ -278,7 +281,7 @@ class TrackerController extends Controller
 
                 $plot_kuning = $plot_kuning->groupBy(['est']);
                 $plot_kuning = json_decode($plot_kuning, true);
-                // dd($plotBlok);
+                // dd($plot_kuning, $blok);
 
                 $arrView['blok'] = $plotBlok;
                 $arrView['pokok'] = $plot_kuning;

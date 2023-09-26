@@ -330,6 +330,7 @@
                 saveAs(blob, 'coordinates.txt');
             });
         });
+
         var areaMapsLayer = L.layerGroup().addTo(map); // Create a layer group for area maps
         var markersLayer = L.markerClusterGroup().addTo(map); // Create a marker cluster group for markers
 
