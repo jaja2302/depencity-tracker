@@ -12,4 +12,6 @@ Route::post('/getauthuserstxt', [LoginController::class, 'login'])->name('getaut
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [TrackerController::class, 'dashboard'])->name('dashboard');
     Route::get('/info', [TrackerController::class, 'info'])->name('info');
+    Route::get('/getBlok', [TrackerController::class, 'getBlok'])->name('getBlok');
+    Route::get('/drawMaps', [TrackerController::class, 'drawMaps'])->name('drawMaps');
 });

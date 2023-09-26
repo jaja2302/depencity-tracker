@@ -48,23 +48,16 @@
                             <a class="active" href="{{ route('dashboard') }}"><span class="icon home" aria-hidden="true"></span>Dashboard</a>
                         </li>
                         <li>
-                            <a class="show-cat-btn" href="##">
-                                <span class="icon document" aria-hidden="true"></span>Posts
-                                <span class="category__btn transparent-btn" title="Open list">
-                                    <span class="sr-only">Open list</span>
-                                    <span class="icon arrow-down" aria-hidden="true"></span>
-                                </span>
-                            </a>
+
                             <ul class="cat-sub-menu">
                                 <li>
-                                    <a href="{{ route('info') }}">All Posts</a>
+                                    <a href="posts.html">All Posts</a>
                                 </li>
                                 <li>
                                     <a href="new-post.html">Add new post</a>
                                 </li>
                             </ul>
                         </li>
-
 
                     </ul>
 
@@ -97,7 +90,8 @@
                     <div class="main-nav-start">
                         <div class="search-wrapper">
                             <i data-feather="search" aria-hidden="true"></i>
-                            <input type="text" placeholder="Enter keywords ..." required>
+
+                            <input type="text" placeholder="Selamat Datang {{ session('user_name') }} " required>
                         </div>
                     </div>
                     <div class="main-nav-end">
