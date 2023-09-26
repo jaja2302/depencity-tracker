@@ -31,8 +31,8 @@
                         <!-- <span class="icon logo" aria-hidden="true"></span> -->
                         <img src="{{ asset('img/logo-SSS.png') }}" style="height: 100%; width: 100%">
                         <div class="logo-text">
-                            <span class="logo-title">Welcome</span>
-                            <span class="logo-subtitle">Dashboard</span>
+                            <span class="logo-title" style="font-size: 30px;">Welcome</span>
+                            <span class="logo-subtitle" style="font-size: 20px;">Dashboard</span>
                         </div>
 
                     </a>
@@ -93,6 +93,10 @@
 
                             <input type="text" placeholder="Selamat Datang {{ session('user_name') }} " required>
                         </div>
+                    </div>
+                    <div class="lang-switcher-wrapper">
+                        <h1 class="main-title">Tracking Plot Kuning</h1>
+
                     </div>
                     <div class="main-nav-end">
                         <button class="sidebar-toggle transparent-btn" title="Menu" type="button">

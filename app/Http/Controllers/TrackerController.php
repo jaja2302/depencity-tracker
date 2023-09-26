@@ -143,10 +143,6 @@ class TrackerController extends Controller
                 $plotEst = json_decode($plotEst, true);
 
 
-                // dd($plotEst);
-
-                // untuk get pokok kuning 
-
 
                 $plot_kuning = DB::connection('mysql2')
                     ->table('deficiency_tracker')
@@ -154,14 +150,12 @@ class TrackerController extends Controller
                     ->join('estate', 'estate.est', '=', 'deficiency_tracker.est')
                     ->join('wil', 'wil.id', '=', 'estate.wil')
                     ->where('wil.regional', '=', $regional)
-                    // ->whereNotIn('id', [353])
                     ->orderBy('id', 'desc') // Sort by 'id' column in descending order
                     ->get();
 
                 $plot_kuning = $plot_kuning->groupBy(['est']);
                 $plot_kuning = json_decode($plot_kuning, true);
 
-                // dd($plot_kuning['NBE'][1]);
 
 
                 $arrView['blok'] = $plotEst;

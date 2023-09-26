@@ -4,9 +4,10 @@
 
 
 <div class="container">
-    <h2 class="main-title" style="text-align: center;">Tracking Plot Kuning</h2>
+
     <h2>Select an Option:</h2>
 
+    <br>
 
     <div class="row stat-cards">
         <div class="col-md-6 col-xl-4">
@@ -63,29 +64,57 @@
 
     </div>
     <br>
+    <!-- Mobile version -->
     <style>
-        .radio-group {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            /* Push radio buttons to the left and "Show" button to the right */
-        }
+        @media (max-width: 768px) {
 
-        .option-select {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            margin-top: 10px;
-            margin-left: 20px;
-            /* Adjust this for spacing between radio buttons and options */
-        }
+            /* Adjust the max-width as needed */
+            .radio-group {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+            }
 
-        .option-select label {
-            margin-right: 20px;
-            /* Adjust this for spacing between options */
+            .option-select {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                margin-top: 10px;
+                margin-left: 0;
+            }
+
+            .option-select label {
+                margin-right: 0;
+            }
         }
     </style>
+
+    <!-- Windows version (using your existing code) -->
+    <style>
+        @media (min-width: 769px) {
+
+            /* Adjust the min-width as needed */
+            .radio-group {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .option-select {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                margin-top: 10px;
+                margin-left: 20px;
+            }
+
+            .option-select label {
+                margin-right: 20px;
+            }
+        }
+    </style>
+
     <div class="row mt-10">
         <div class="col-lg-12">
             <div class="card p-4">
@@ -93,33 +122,33 @@
                     <!-- Radio button for "Regional" -->
                     <div style="display: inline-block; margin-right: 10px;">
                         <input type="radio" id="regional" name="option" value="Regional">
-                        <label for="regional">Regional</label>
+                        <label class="main-title" for="regional">Regional</label>
                     </div>
                     <!-- Radio button for "Estate" -->
                     <div style="display: inline-block; margin-right: 10px;">
                         <input type="radio" id="estate" name="option" value="Estate">
-                        <label for="estate">Estate</label>
+                        <label class="main-title" for="estate">Estate</label>
                     </div>
                     <!-- Radio button for "Afdeling" -->
                     <div style="display: inline-block; margin-right: 10px;">
                         <input type="radio" id="afdeling" name="option" value="Afdeling">
-                        <label for="afdeling">Afdeling</label>
+                        <label class="main-title" for="afdeling">Afdeling</label>
                     </div>
                     <!-- Radio button for "Blok" -->
                     <div style="display: inline-block;">
                         <input type="radio" id="blok" name="option" value="Blok">
-                        <label for="blok">Blok</label>
+                        <label class="main-title" for="blok">Blok</label>
                     </div>
                     <!-- "Show" button container -->
                     <div style="text-align: right;">
                         <button class="btn btn-primary mb-3" id="btnShow">Show</button>
-                        <button class="btn btn-primary mb-3" id="saveButton">Save Maps</button>
+                        <!-- <button class="btn btn-primary mb-3" id="saveButton">Save Maps</button> -->
                     </div>
                 </div>
                 <div class="radio-group">
                     <div class="option-select" id="regional-option" style="display: none;">
                         <!-- Additional options for Regional -->
-                        <label>Pilih Regional:</label>
+                        <label class="main-title">Pilih Regional:</label>
                         {{csrf_field()}}
                         <select class="form-control" id="afdreg" onchange="populateEstateOptions(this.value)">
 
@@ -128,27 +157,33 @@
                     </div>
                     <div class="option-select" id="estate-option" style="display: none;">
                         <!-- Additional options for Estate -->
-                        <label>Pilih Estate:</label>
+                        <label class="main-title">Pilih Estate:</label>
                         <select class="form-control" id="est" onchange="populateAfdelingOptions(this.value)">
                         </select>
                     </div>
 
                     <div class="option-select" id="afdeling-option" style="display: none;">
                         <!-- Additional options for Afdeling -->
-                        <label>Pilih Afdeling:</label>
+                        <label class="main-title">Pilih Afdeling:</label>
                         <select class="form-control" id="afd"></select>
                     </div>
                     <div class="option-select" id="blok-option" style="display: none;">
                         <!-- Additional options for Blok -->
-                        <label>Pilih Blok:</label>
+                        <label class="main-title">Pilih Blok:</label>
                         <select class="form-control" id="bloxk"></select>
                     </div>
                 </div>
-                <div id="map" style="height: 650px; background-color: white;"></div>
+
+
             </div>
+
             <div class="chart">
-                <canvas id="myChart" aria-label="Site statistics" role="img"></canvas>
+                <div id="map" style="height: 650px; z-index: 1;"></div>
             </div>
+
+            <!--<div class="chart">-->
+            <!--    <canvas id="myChart" aria-label="Site statistics" role="img"></canvas>-->
+            <!--</div>-->
         </div>
     </div>
 
