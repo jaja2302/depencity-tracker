@@ -157,9 +157,23 @@ class TrackerController extends Controller
                 $plot_kuning = json_decode($plot_kuning, true);
 
 
+                $pokok_kuning = DB::connection('mysql2')
+                    ->table('deficiency_tracker')
+                    ->select('deficiency_tracker.*', 'wil.regional')
+                    ->join('estate', 'estate.est', '=', 'deficiency_tracker.est')
+                    ->join('wil', 'wil.id', '=', 'estate.wil')
+                    ->where('wil.regional', '=', $regional)
+                    ->orderBy('id', 'desc') // Sort by 'id' column in descending order
+                    ->paginate(50); // You can change 10 to the number of items per page you want
+
+                // Now, you can use $pokok_kuning in your view for pagination
+                // dd($pokok_kuning);
+
+
 
                 $arrView['blok'] = $plotEst;
                 $arrView['pokok'] = $plot_kuning;
+                $arrView['pokok_kuning'] = $pokok_kuning;
 
                 // dd($plotEst);
                 break;
@@ -189,11 +203,25 @@ class TrackerController extends Controller
                     ->orderBy('id', 'desc') // Sort by 'id' column in descending order
                     ->get();
 
+                $pokok_kuning = DB::connection('mysql2')
+                    ->table('deficiency_tracker')
+                    ->select('deficiency_tracker.*')
+                    ->where('deficiency_tracker.est', '=', $estate)
+                    // ->whereNotIn('id', [353])
+                    ->orderBy('id', 'desc') // Sort by 'id' column in descending order
+                    ->paginate(50); // You can change 10 to the number of items per page you want
+
+                // Now, you can use $pokok_kuning in your view for pagination
+                // dd($pokok_kuning);
+
                 $plot_kuning = $plot_kuning->groupBy(['est']);
                 $plot_kuning = json_decode($plot_kuning, true);
 
                 $arrView['blok'] = $plotEst;
                 $arrView['pokok'] = $plot_kuning;
+
+                // $pokok_kuning = [];
+                $arrView['pokok_kuning'] = $pokok_kuning;
 
                 break;
 
@@ -242,10 +270,23 @@ class TrackerController extends Controller
                 $plot_kuning = $plot_kuning->groupBy(['est']);
                 $plot_kuning = json_decode($plot_kuning, true);
 
+                $pokok_kuning = DB::connection('mysql2')
+                    ->table('deficiency_tracker')
+                    ->select('deficiency_tracker.*')
+                    ->join('afdeling', 'afdeling.nama', '=', 'deficiency_tracker.afd')
+                    ->where('deficiency_tracker.est', '=', $estate)
+                    ->where('afdeling.id', '=', $afdeling)
+                    // ->whereNotIn('id', [353])
+                    ->orderBy('id', 'desc') // Sort by 'id' column in descending order
+                    ->paginate(50); // You can change 10 to the number of items per page you want
+
                 // dd($plot_kuning, $afdeling);
 
                 $arrView['blok'] = $plotAfd;
                 $arrView['pokok'] = $plot_kuning;
+                // $pokok_kuning = [];
+                $arrView['pokok_kuning'] = $pokok_kuning;
+
                 break;
 
             case 'blok':
@@ -272,6 +313,14 @@ class TrackerController extends Controller
                     ->orderBy('id', 'desc')
                     ->get();
 
+                $pokok_kuning = DB::connection('mysql2')
+                    ->table('deficiency_tracker')
+                    ->select('deficiency_tracker.*')
+                    ->where('deficiency_tracker.est', '=', $estate)
+                    // ->where('deficiency_tracker.afd', '=', $afdeling)
+                    ->where('deficiency_tracker.blok', 'LIKE', '%' . $blok . '%') // Use LIKE with % to match partial strings
+                    ->orderBy('id', 'desc')
+                    ->paginate(50); // You can change 10 to the number of items per page you want
 
                 $plot_kuning = $plot_kuning->groupBy(['est']);
                 $plot_kuning = json_decode($plot_kuning, true);
@@ -279,6 +328,8 @@ class TrackerController extends Controller
 
                 $arrView['blok'] = $plotBlok;
                 $arrView['pokok'] = $plot_kuning;
+                // $pokok_kuning = [];
+                $arrView['pokok_kuning'] = $pokok_kuning;
                 break;
 
             default:

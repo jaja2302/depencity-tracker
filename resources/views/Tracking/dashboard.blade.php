@@ -141,10 +141,13 @@
                     </div>
                     <!-- "Show" button container -->
                     <div style="text-align: right;">
-                        <button class="btn btn-primary mb-3" id="btnShow">Show</button>
+                        <button class="btn btn-primary mb-3" id="btnShow" style="padding: 10px 20px; background-color: #007BFF; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">Show</button>
+
                         <!-- <button class="btn btn-primary mb-3" id="saveButton">Save Maps</button> -->
                     </div>
+
                 </div>
+
                 <div class="radio-group">
                     <div class="option-select" id="regional-option" style="display: none;">
                         <!-- Additional options for Regional -->
@@ -173,12 +176,20 @@
                         <select class="form-control" id="bloxk"></select>
                     </div>
                 </div>
+                <div class="radio-group">
+                    <div class="button-container">
+
+                        <button id="loadPrevPageButton" class="custom-button" style="padding: 10px 20px; background-color: #007BFF; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">Prev Page</button>
+                        <button id="loadNextPageButton" class="custom-button" style="padding: 10px 20px; background-color: #007BFF; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">Next Page</button>
+                    </div>
+                </div>
+
 
 
             </div>
 
             <div class="chart">
-                <div id="map" style="height: 650px; z-index: 1;"></div>
+                <div id="map" style="height: 500px; z-index: 1;"></div>
             </div>
 
             <!--<div class="chart">-->
@@ -222,7 +233,6 @@
     var opt_reg = <?php echo json_encode($option_reg); ?>;
     var opt_est = <?php echo json_encode($option_est); ?>;
     var opt_afd = <?php echo json_encode($option_afd); ?>;
-
 
     var afdregSelect = document.getElementById('afdreg');
 
@@ -405,25 +415,25 @@
             map.fitBounds(bounds);
         }
 
-        function drawPokok(pokok) {
-            markersLayer.clearLayers(); // Clear markers layer only
+        // function drawPokok(pokok) {
+        //     markersLayer.clearLayers(); // Clear markers layer only
 
-            for (var i = 0; i < pokok.length; i++) {
-                var regionData = pokok[i][1];
+        //     for (var i = 0; i < pokok.length; i++) {
+        //         var regionData = pokok[i][1];
 
-                if (Array.isArray(regionData)) {
-                    for (var j = 0; j < regionData.length; j++) {
-                        var obj = regionData[j];
-                        var lat = obj.lat;
-                        var lon = obj.lon;
-                        var afd_nama = obj.afd_nama;
+        //         if (Array.isArray(regionData)) {
+        //             for (var j = 0; j < regionData.length; j++) {
+        //                 var obj = regionData[j];
+        //                 var lat = obj.lat;
+        //                 var lon = obj.lon;
+        //                 var afd_nama = obj.afd_nama;
 
-                        var marker = L.marker([lat, lon]).addTo(markersLayer);
-                        marker.bindPopup(afd_nama); // Optionally, you can add popups to markers
-                    }
-                }
-            }
-        }
+        //                 var marker = L.marker([lat, lon]).addTo(markersLayer);
+        //                 marker.bindPopup(afd_nama); // Optionally, you can add popups to markers
+        //             }
+        //         }
+        //     }
+        // }
 
 
 
@@ -551,22 +561,109 @@
             // Add the dataType to the requestData object
             requestData['dataType'] = dataType;
 
-            // Perform the AJAX request with the requestData
-            $.ajax({
-                url: "{{ route('drawMaps') }}",
-                method: 'GET',
-                data: requestData,
-                success: function(result) {
-                    var plot = JSON.parse(result);
-                    const RegResult = Object.entries(plot['blok']);
-                    const pokok = Object.entries(plot['pokok']);
-                    drawMaps(RegResult);
-                    drawPokok(pokok);
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    console.error('AJAX error:', errorThrown);
+            // // Perform the AJAX request with the requestData
+            // $.ajax({
+            //     url: "{{ route('drawMaps') }}",
+            //     method: 'GET',
+            //     data: requestData,
+            //     success: function(result) {
+            //         var plot = JSON.parse(result);
+            //         const RegResult = Object.entries(plot['blok']);
+            //         const pokok = Object.entries(plot['pokok']);
+
+            //         drawMaps(RegResult);
+            //         drawPokok(pokok);
+
+
+            //         const pokok_kuning = Object.entries(plot['pokok_kuning']);
+
+            //         console.log(pokok_kuning);
+            //     },
+            //     error: function(xhr, textStatus, errorThrown) {
+            //         console.error('AJAX error:', errorThrown);
+            //     }
+            // });
+
+            // Define a variable to keep track of the current page
+            let currentPage = 1;
+
+            // Function to fetch data for a given page
+            function fetchData(page) {
+                // Perform the AJAX request with the requestData
+                $.ajax({
+                    url: "{{ route('drawMaps') }}",
+                    method: 'GET',
+                    data: {
+                        ...requestData,
+                        page
+                    }, // Include the page parameter in the request data
+                    success: function(result) {
+                        var plot = JSON.parse(result);
+                        const RegResult = Object.entries(plot['blok']);
+                        const pokok = Object.entries(plot['pokok']);
+                        markersLayer.clearLayers(); // Clear markers layer only
+                        drawMaps(RegResult);
+                        // drawPokok(pokok);
+
+                        const pokok_kuning = Object.entries(plot['pokok_kuning']);
+                        const data = pokok_kuning[1][1];
+
+                        // drawPokok(pokok);
+                        // console.log(data);
+
+                        // Assuming your JSON data is stored in a variable called data
+                        for (var j = 0; j < data.length; j++) {
+                            var obj = data[j];
+                            var lat = obj.lat;
+                            var lon = obj.lon;
+                            var afd_nama = obj.blok;
+                            var kondisi = obj.kondisi;
+                            var status = obj.status;
+
+                            // Create an HTML string for the popup content
+                            var popupContent = `
+                                <strong>Blok:</strong> ${afd_nama}<br>
+                                <strong>Kondisi:</strong> ${kondisi}<br>
+                                <strong>Status:</strong> ${status}
+                            `;
+
+                            var marker = L.marker([lat, lon]).addTo(markersLayer);
+
+                            // Set the HTML content as the popup for the marker
+                            marker.bindPopup(popupContent);
+                        }
+                        currentPage = page;
+                        // console.log(`Page: ${page}`);
+                        // console.log(pokok_kuning);
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.error('AJAX error:', errorThrown);
+                    }
+                });
+            }
+
+            $('#loadNextPageButton').click(function() {
+                // Increment the current page number
+                currentPage++;
+
+                // Fetch data for the next page
+                fetchData(currentPage);
+            });
+
+            // Event listener for the "Load Prev Page" button
+            $('#loadPrevPageButton').click(function() {
+                // Check if currentPage is greater than 1 to avoid going to negative page numbers
+                if (currentPage > 1) {
+                    // Decrement the current page number
+                    currentPage--;
+
+                    // Fetch data for the previous page
+                    fetchData(currentPage);
                 }
             });
+            // Initial data fetch (page 1)
+            fetchData(currentPage);
+
 
             // end ajax 
         });
