@@ -16,14 +16,14 @@
                     <i data-feather="bar-chart-2" aria-hidden="true"></i>
                 </div>
                 <div class="stat-cards-info">
-                    <p class="stat-cards-info__num">1478 286</p>
+                    <p class="stat-cards-info__num" id="total_pk"></p>
                     <p class="stat-cards-info__title">Total Pokok Kuning</p>
-                    <p class="stat-cards-info__progress">
+                    <!-- <p class="stat-cards-info__progress">
                         <span class="stat-cards-info__profit success">
                             <i data-feather="trending-up" aria-hidden="true"></i>4.07%
                         </span>
                         Last month
-                    </p>
+                    </p> -->
                 </div>
             </article>
         </div>
@@ -33,14 +33,14 @@
                     <i data-feather="file" aria-hidden="true"></i>
                 </div>
                 <div class="stat-cards-info">
-                    <p class="stat-cards-info__num">1478 286</p>
+                    <p class="stat-cards-info__num" id="sembuh_pk"></p>
                     <p class="stat-cards-info__title">Total Sembuh</p>
-                    <p class="stat-cards-info__progress">
+                    <!-- <p class="stat-cards-info__progress">
                         <span class="stat-cards-info__profit success">
                             <i data-feather="trending-up" aria-hidden="true"></i>0.24%
                         </span>
                         Last month
-                    </p>
+                    </p> -->
                 </div>
             </article>
         </div>
@@ -50,14 +50,14 @@
                     <i data-feather="file" aria-hidden="true"></i>
                 </div>
                 <div class="stat-cards-info">
-                    <p class="stat-cards-info__num">1478 286</p>
+                    <p class="stat-cards-info__num" id="persen_pk"></p>
                     <p class="stat-cards-info__title">Progress</p>
-                    <p class="stat-cards-info__progress">
+                    <!-- <p class="stat-cards-info__progress">
                         <span class="stat-cards-info__profit danger">
                             <i data-feather="trending-down" aria-hidden="true"></i>1.64%
                         </span>
                         Last month
-                    </p>
+                    </p> -->
                 </div>
             </article>
         </div>
@@ -87,6 +87,10 @@
                 margin-right: 0;
             }
         }
+
+        .loading-text {
+            animation: fadeInOut 2s ease-in-out infinite;
+        }
     </style>
 
     <!-- Windows version (using your existing code) -->
@@ -99,108 +103,124 @@
                 flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
+                /* Align to the left and right */
             }
 
-            .option-select {
+            .radio-group .radio-options {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
-                margin-top: 10px;
-                margin-left: 20px;
+                margin-right: 20px;
+                /* Adjust the margin as needed */
             }
 
-            .option-select label {
-                margin-right: 20px;
+            .radio-group label {
+                margin: 0;
+                /* Remove margin from labels */
             }
         }
     </style>
 
     <div class="row mt-10">
         <div class="col-lg-12">
-            <div class="card p-4">
-                <div class="radio-group">
-                    <!-- Radio button for "Regional" -->
-                    <div style="display: inline-block; margin-right: 10px;">
-                        <input type="radio" id="regional" name="option" value="Regional">
-                        <label class="main-title" for="regional">Regional</label>
-                    </div>
-                    <!-- Radio button for "Estate" -->
-                    <div style="display: inline-block; margin-right: 10px;">
-                        <input type="radio" id="estate" name="option" value="Estate">
-                        <label class="main-title" for="estate">Estate</label>
-                    </div>
-                    <!-- Radio button for "Afdeling" -->
-                    <div style="display: inline-block; margin-right: 10px;">
-                        <input type="radio" id="afdeling" name="option" value="Afdeling">
-                        <label class="main-title" for="afdeling">Afdeling</label>
-                    </div>
-                    <!-- Radio button for "Blok" -->
-                    <div style="display: inline-block;">
-                        <input type="radio" id="blok" name="option" value="Blok">
-                        <label class="main-title" for="blok">Blok</label>
-                    </div>
-                    <!-- "Show" button container -->
-                    <div style="text-align: right;">
-                        <button class="btn btn-primary mb-3" id="btnShow" style="padding: 10px 20px; background-color: #007BFF; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">Show</button>
-
-                        <!-- <button class="btn btn-primary mb-3" id="saveButton">Save Maps</button> -->
-                    </div>
-
+            <div class="radio-group">
+                <!-- Radio button for "Regional" -->
+                <div style="display: inline-block; margin-right: 10px;">
+                    <input type="radio" id="regional" name="option" value="Regional">
+                    <label class="main-title" for="regional">Regional</label>
                 </div>
-
-                <div class="radio-group">
-                    <div class="option-select" id="regional-option" style="display: none;">
-                        <!-- Additional options for Regional -->
-                        <label class="main-title">Pilih Regional:</label>
-                        {{csrf_field()}}
-                        <select class="form-control" id="afdreg" onchange="populateEstateOptions(this.value)">
-
-
-                        </select>
-                    </div>
-                    <div class="option-select" id="estate-option" style="display: none;">
-                        <!-- Additional options for Estate -->
-                        <label class="main-title">Pilih Estate:</label>
-                        <select class="form-control" id="est" onchange="populateAfdelingOptions(this.value)">
-                        </select>
-                    </div>
-
-                    <div class="option-select" id="afdeling-option" style="display: none;">
-                        <!-- Additional options for Afdeling -->
-                        <label class="main-title">Pilih Afdeling:</label>
-                        <select class="form-control" id="afd"></select>
-                    </div>
-                    <div class="option-select" id="blok-option" style="display: none;">
-                        <!-- Additional options for Blok -->
-                        <label class="main-title">Pilih Blok:</label>
-                        <select class="form-control" id="bloxk"></select>
-                    </div>
+                <!-- Radio button for "Estate" -->
+                <div style="display: inline-block; margin-right: 10px;">
+                    <input type="radio" id="estate" name="option" value="Estate">
+                    <label class="main-title" for="estate">Estate</label>
                 </div>
-                <div class="radio-group">
-                    <div class="button-container">
-
-                        <button id="loadPrevPageButton" class="custom-button" style="padding: 10px 20px; background-color: #007BFF; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">Prev Page</button>
-                        <button id="loadNextPageButton" class="custom-button" style="padding: 10px 20px; background-color: #007BFF; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin: 5px;">Next Page</button>
-                    </div>
+                <!-- Radio button for "Afdeling" -->
+                <div style="display: inline-block; margin-right: 10px;">
+                    <input type="radio" id="afdeling" name="option" value="Afdeling">
+                    <label class="main-title" for="afdeling">Afdeling</label>
                 </div>
-
-
+                <!-- Radio button for "Blok" -->
+                <div style="display: inline-block;">
+                    <input type="radio" id="blok" name="option" value="Blok">
+                    <label class="main-title" for="blok">Blok</label>
+                </div>
+                <!-- "Show" button container -->
+                <div style="text-align: right;">
+                    <button id="btnShow" style="background-color: #007bff; color: white; border: none; padding: 10px 10px; border-radius: 5px;">Show</button>
+                </div>
 
             </div>
+            <div class="radio-group">
+                <div class="option-select" id="regional-option" style="display: none;">
+                    <!-- Additional options for Regional -->
+                    <label class="main-title" style="font-size: 18px;">Pilih Regional:</label>
+                    {{csrf_field()}}
+                    <select class="form-control" id="afdreg" onchange="populateEstateOptions(this.value)">
 
-            <div class="chart">
-                <div id="map" style="height: 500px; z-index: 1;"></div>
+
+                    </select>
+                </div>
+                <div class="option-select" id="estate-option" style="display: none;">
+                    <!-- Additional options for Estate -->
+                    <label class="main-title" style="font-size: 18px;">Pilih Estate:</label>
+                    <select class="form-control" id="est" onchange="populateAfdelingOptions(this.value)">
+                    </select>
+                </div>
+
+                <div class="option-select" id="afdeling-option" style="display: none;">
+                    <!-- Additional options for Afdeling -->
+                    <label class="main-title" style="font-size: 18px;">Pilih Afdeling:</label>
+                    <select class="form-control" id="afd"></select>
+                </div>
+                <div class="option-select" id="blok-option" style="display: none;">
+                    <!-- Additional options for Blok -->
+                    <label class="main-title" style="font-size: 18px;">Pilih Blok:</label>
+                    <select class="form-control" id="bloxk"></select>
+                </div>
             </div>
+        </div>
+        <div class="col-lg-12">
 
-            <!--<div class="chart">-->
-            <!--    <canvas id="myChart" aria-label="Site statistics" role="img"></canvas>-->
-            <!--</div>-->
+            <div id="map" style="height: 540px; z-index: 1;"></div>
+
         </div>
     </div>
 
 
 
     </body>
+
+
+    <style>
+        /* CSS for legend styling */
+        .info.legend {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .info.legend label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .label-blok {
+            background-color: transparent;
+            /* Set the background color to transparent */
+            color: white;
+            /* Set the text color to white */
+            border: none;
+            /* Remove any border */
+            font-size: 12px;
+            /* Adjust the font size as needed */
+            text-align: center;
+            width: auto;
+            padding: 0;
+            /* Adjust padding as needed */
+        }
+    </style>
 
 
 
@@ -230,9 +250,22 @@
 
 
 <script>
+    function openModal(src, komentar) {
+        Swal.fire({
+            imageUrl: src,
+            imageAlt: 'Image',
+            imageHeight: '80%',
+            imageWidth: '100%',
+            width: '50%',
+            html: `<p>Komentar:</p><p>${komentar}</p>`
+        });
+    }
+
+
     var opt_reg = <?php echo json_encode($option_reg); ?>;
     var opt_est = <?php echo json_encode($option_est); ?>;
     var opt_afd = <?php echo json_encode($option_afd); ?>;
+
 
     var afdregSelect = document.getElementById('afdreg');
 
@@ -250,8 +283,6 @@
         });
     }
 
-    // Call the populateSelect function with the opt_reg array
-    // Call the populateSelect function with the opt_reg array
     populateSelect(opt_reg);
 
     // Get the default selected Regional option (for example, the first option)
@@ -309,6 +340,8 @@
 
     $(document).ready(function() {
 
+
+
         var group = L.layerGroup();
 
         // Initialize the map and set its view
@@ -316,68 +349,65 @@
             editable: true // Enable editing
         }).setView([-2.2745234, 111.61404248], 11);
 
-        // Rest of your code remains the same
-
-        var googleStreet = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
+        // Define the "Google Satellite" tile layer
         var googleSatellite = L.tileLayer('http://{s}.google.com/vt?lyrs=s&x={x}&y={y}&z={z}', {
             maxZoom: 20,
             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
         });
 
-        googleStreet.addTo(map); // Add "Google Street" as the default base map
+        // Add "Google Satellite" as the only base map
+        googleSatellite.addTo(map);
 
-        var baseMaps = {
-            "Google Street": googleStreet,
-            "Google Satellite": googleSatellite
-        };
-
-        L.control.layers(baseMaps).addTo(map);
         map.addControl(new L.Control.Fullscreen());
 
-        var drawnItems = new L.FeatureGroup();
-        map.addLayer(drawnItems);
+        var areaMapsLayer = L.layerGroup().addTo(map); // Create a layer group for area maps
+        var markersLayer = L.markerClusterGroup().addTo(map);
+        var markerBlok = L.markerClusterGroup().addTo(map);
 
-        var drawControl = new L.Control.Draw({
-            edit: {
-                featureGroup: drawnItems,
-                poly: {
-                    allowIntersection: false
-                }
-            },
-            draw: {
-                polygon: {
-                    allowIntersection: false,
-                    showArea: true
-                }
+        map.addLayer(areaMapsLayer);
+        map.removeLayer(markerBlok); // Hide Draw Blok initially
+
+        // Define a unique ID for the legend container
+        var legendId = 'legend-container2';
+
+        // Remove the previous legend if it exists
+        var existingLegend = document.getElementById(legendId);
+        if (existingLegend) {
+            existingLegend.remove();
+        }
+
+        // Define the legend control
+        var legend = L.control({
+            position: 'bottomleft'
+        });
+
+        legend.onAdd = function(map) {
+            var div = L.DomUtil.create('div', 'info legend');
+            div.id = legendId; // Set the unique ID
+            div.innerHTML = '<strong>Legend</strong><br>';
+            div.innerHTML += '<label for="drawMapsCheckbox"><input type="radio" name="mapToggle" id="drawMapsCheckbox" checked> Draw Maps</label><br>';
+            div.innerHTML += '<label for="drawblokCheckbox"><input type="radio" name="mapToggle" id="drawblokCheckbox"> Draw Blok</label><br>';
+            return div;
+        };
+
+        legend.addTo(map);
+
+        // Add event listeners to the radio buttons
+        document.getElementById('drawMapsCheckbox').addEventListener('change', function() {
+            if (this.checked) {
+                map.addLayer(areaMapsLayer);
+                map.removeLayer(markerBlok);
             }
         });
-        map.addControl(drawControl);
-        map.on('draw:created', function(e) {
-            var layer = e.layer;
-            drawnItems.addLayer(layer);
 
-            // Access the polygon's coordinates
-            var polygonCoordinates = layer.getLatLngs();
-            console.log('Polygon Coordinates:', polygonCoordinates);
-
-            $('#saveButton').click(function() {
-                // Assuming you have the coordinates in an array named 'polygonCoordinates'
-                var textData = polygonCoordinates.map(function(latLng) {
-                    return 'est' + 'afd' + latLng.lat + ',' + latLng.lng;
-                }).join('\n');
-
-                // Create a Blob with the text data and save it as a TXT file
-                var blob = new Blob([textData], {
-                    type: 'text/plain;charset=utf-8'
-                });
-
-                // Save the Blob as a TXT file
-                saveAs(blob, 'coordinates.txt');
-            });
+        document.getElementById('drawblokCheckbox').addEventListener('change', function() {
+            if (this.checked) {
+                map.addLayer(markerBlok);
+                // map.removeLayer(areaMapsLayer);
+            }
         });
 
-        var areaMapsLayer = L.layerGroup().addTo(map); // Create a layer group for area maps
-        var markersLayer = L.markerClusterGroup().addTo(map); // Create a marker cluster group for markers
+
 
         function drawMaps(regions) {
             areaMapsLayer.clearLayers(); // Clear area maps layer only
@@ -407,7 +437,12 @@
                         coordinates.push(latLng);
                     }
 
-                    var polygon = L.polygon(coordinates).addTo(areaMapsLayer);
+                    // var polygon = L.polygon(coordinates).addTo(areaMapsLayer);
+
+                    var polygon = L.polygon(coordinates, {
+                        fillOpacity: 0.2, // Set the fill opacity to a low value
+                        opacity: 0.5 // Set the border opacity to a low value
+                    }).addTo(areaMapsLayer);
                 }
             }
 
@@ -415,28 +450,208 @@
             map.fitBounds(bounds);
         }
 
-        // function drawPokok(pokok) {
-        //     markersLayer.clearLayers(); // Clear markers layer only
+        function drawPokok(pokok) {
+            markersLayer.clearLayers(); // Clear markers layer only
 
-        //     for (var i = 0; i < pokok.length; i++) {
-        //         var regionData = pokok[i][1];
+            var beratIcon = L.icon({
+                iconUrl: '{{ asset("img/berat.png") }}',
+                iconSize: [32, 32], // Set the size of the icon
+            });
 
-        //         if (Array.isArray(regionData)) {
-        //             for (var j = 0; j < regionData.length; j++) {
-        //                 var obj = regionData[j];
-        //                 var lat = obj.lat;
-        //                 var lon = obj.lon;
-        //                 var afd_nama = obj.afd_nama;
+            var ringanIcon = L.icon({
+                iconUrl: '{{ asset("img/ringan.png") }}',
+                iconSize: [32, 32],
+            });
 
-        //                 var marker = L.marker([lat, lon]).addTo(markersLayer);
-        //                 marker.bindPopup(afd_nama); // Optionally, you can add popups to markers
-        //             }
-        //         }
-        //     }
-        // }
+            var sedangIcon = L.icon({
+                iconUrl: '{{ asset("img/pucat.png") }}',
+                iconSize: [32, 32],
+            });
+            var defaultIcon = L.icon({
+                iconUrl: '{{ asset("img/palm-oil-free.png") }}',
+                iconSize: [32, 32],
+            });
 
+            var iconSembuh = L.icon({
+                iconUrl: '{{ asset("img/sembuhnih.png") }}',
+                iconSize: [32, 32],
+            });
 
+            var legendId = 'legend-container'; // Unique ID for the legend container
 
+            // Remove the previous legend if it exists
+            var existingLegend = document.getElementById(legendId);
+            if (existingLegend) {
+                existingLegend.remove();
+            }
+
+            var legendContainer = L.control({
+                position: 'topright'
+            });
+
+            legendContainer.onAdd = function(map) {
+                var div = L.DomUtil.create('div', 'info legend');
+                div.id = legendId; // Set the unique ID
+                div.innerHTML += '<strong>Legend</strong><br>';
+                div.innerHTML += '<strong>Status:</strong><br>';
+                div.innerHTML += '<label><input type="radio" name="statusFilter" value="all" checked> All</label><br>';
+                div.innerHTML += '<label><input type="radio" name="statusFilter" value="Sudah"> Sudah</label><br>';
+                div.innerHTML += '<strong>Kondisi:</strong><br>';
+                div.innerHTML += '<label><input type="radio" name="kondisiFilter" value="all" checked> All</label><br>';
+                div.innerHTML += '<label><input type="radio" name="kondisiFilter" value="Berat"> Berat</label><br>';
+                div.innerHTML += '<label><input type="radio" name="kondisiFilter" value="Ringan"> Ringan</label><br>';
+                div.innerHTML += '<label><input type="radio" name="kondisiFilter" value="Pucat"> Pucat</label><br>';
+                return div;
+            };
+
+            legendContainer.addTo(map);
+
+            var statusFilter = "all"; // Default status filter
+            var kondisiFilter = "all"; // Default kondisi filter
+
+            // Add event listeners for status radio buttons
+            var statusFilterRadios = document.getElementsByName('statusFilter');
+            for (var i = 0; i < statusFilterRadios.length; i++) {
+                statusFilterRadios[i].addEventListener('change', function() {
+                    statusFilter = this.value;
+                    if (statusFilter !== "all") {
+                        // If Status filter is not "All", select "All" in Kondisi filter
+                        kondisiFilter = "all";
+                        // Update Kondisi filter radio buttons
+                        var kondisiFilterRadios = document.getElementsByName('kondisiFilter');
+                        for (var j = 0; j < kondisiFilterRadios.length; j++) {
+                            kondisiFilterRadios[j].checked = kondisiFilterRadios[j].value === kondisiFilter;
+                        }
+                    }
+                    updateMarkers();
+                });
+            }
+
+            // Add event listeners for kondisi radio buttons
+            var kondisiFilterRadios = document.getElementsByName('kondisiFilter');
+            for (var i = 0; i < kondisiFilterRadios.length; i++) {
+                kondisiFilterRadios[i].addEventListener('change', function() {
+                    kondisiFilter = this.value;
+                    if (kondisiFilter !== "all") {
+                        // If Kondisi filter is not "All", select "All" in Status filter
+                        statusFilter = "all";
+                        // Update Status filter radio buttons
+                        var statusFilterRadios = document.getElementsByName('statusFilter');
+                        for (var j = 0; j < statusFilterRadios.length; j++) {
+                            statusFilterRadios[j].checked = statusFilterRadios[j].value === statusFilter;
+                        }
+                    }
+                    updateMarkers();
+                });
+            }
+
+            function updateMarkers() {
+                markersLayer.clearLayers(); // Clear markers layer
+
+                for (var i = 0; i < pokok.length; i++) {
+                    var regionData = pokok[i][1];
+
+                    if (Array.isArray(regionData)) {
+                        for (var j = 0; j < regionData.length; j++) {
+                            var obj = regionData[j];
+                            var lat = obj.lat;
+                            var lon = obj.lon;
+                            var afd_nama = obj.blok;
+                            var kondisi = obj.kondisi;
+                            var status = obj.status;
+                            var foto = obj.foto;
+                            var komentar = obj.komentar;
+                            var id = obj.id;
+
+                            if ((statusFilter === "all" || statusFilter === status) && (kondisiFilter === "all" || kondisiFilter === kondisi)) {
+                                var icon;
+                                if (status === 'Sudah') {
+                                    icon = iconSembuh;
+                                } else {
+                                    if (kondisi === 'Berat') {
+                                        icon = beratIcon;
+                                    } else if (kondisi === 'Ringan') {
+                                        icon = ringanIcon;
+                                    } else if (kondisi === 'Pucat') {
+                                        icon = sedangIcon;
+                                    } else {
+                                        // Default icon if kondisi doesn't match any category
+                                        icon = defaultIcon;
+                                    }
+                                }
+
+                                var popupContent = `<strong>Dtracking Blok: </strong>${afd_nama}<br/>`;
+                                popupContent += `<strong>Kondisi: </strong>${kondisi}<br/>`;
+                                popupContent += `<strong>Status: </strong>${status}<br/>`;
+                                popupContent += `<strong>ID: </strong>${id}<br/>`;
+                                if (foto) {
+                                    popupContent += `<img src="https://mobilepro.srs-ssms.com/storage/app/public/deficiency_tracker/${foto}" alt="Foto Temuan" style="max-width:200px; height:auto;" onclick="openModal(this.src, '${komentar}')"><br/>`;
+                                }
+
+                                var marker = L.marker([lat, lon], {
+                                    icon: icon
+                                }).addTo(markersLayer);
+                                marker.bindPopup(popupContent);
+                            }
+                        }
+                    }
+                }
+            }
+
+            updateMarkers(); // Initially display all markers
+        }
+
+        function drawblok(drawBlok) {
+            markerBlok.clearLayers(); // Clear area maps layer only
+
+            var bounds = new L.LatLngBounds(); // Create a bounds object to store the coordinates
+
+            for (var i = 0; i < drawBlok.length; i++) {
+                var regionData = drawBlok[i][1];
+
+                // Check if regionData is an array
+                if (Array.isArray(regionData)) {
+                    // Initialize an array to store coordinates for the polyline
+                    var coordinates = [];
+
+                    // Loop through the array of objects within regionData
+                    for (var j = 0; j < regionData.length; j++) {
+                        var obj = regionData[j];
+                        var lat = obj.lat;
+                        var lon = obj.lon;
+                        var afd_nama = obj.nama;
+
+                        // Create a LatLng object for each coordinate
+                        var latLng = new L.LatLng(lat, lon);
+
+                        // Extend the bounds with the new LatLng object
+                        bounds.extend(latLng);
+                        coordinates.push(latLng);
+                    }
+
+                    var polygon = L.polygon(coordinates, {
+                        fillColor: 'red', // Set the fill color to red
+                        color: 'red', // Set the border color to red
+                        fillOpacity: 0.01, // Set the fill opacity to a low value
+                        opacity: 0.01 // Set the border opacity to a low value
+                    }).addTo(markerBlok);
+                    // Calculate the center of the polygon
+                    var polygonCenter = polygon.getBounds().getCenter();
+
+                    // Create a label marker at the center with afd_nama text
+                    var label = L.marker(polygonCenter, {
+                        icon: L.divIcon({
+                            className: 'label-blok',
+                            html: afd_nama,
+                            iconSize: [50, 10],
+                        })
+                    }).addTo(markerBlok);
+                }
+            }
+
+            // Fit the map to the calculated bounds
+            map.fitBounds(bounds);
+        }
 
         // end maps 
 
@@ -560,110 +775,67 @@
 
             // Add the dataType to the requestData object
             requestData['dataType'] = dataType;
+            Swal.fire({
+                title: 'Loading',
+                html: '<span class="loading-text">Mohon Tunggu...</span>',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
 
-            // // Perform the AJAX request with the requestData
-            // $.ajax({
-            //     url: "{{ route('drawMaps') }}",
-            //     method: 'GET',
-            //     data: requestData,
-            //     success: function(result) {
-            //         var plot = JSON.parse(result);
-            //         const RegResult = Object.entries(plot['blok']);
-            //         const pokok = Object.entries(plot['pokok']);
-
-            //         drawMaps(RegResult);
-            //         drawPokok(pokok);
-
-
-            //         const pokok_kuning = Object.entries(plot['pokok_kuning']);
-
-            //         console.log(pokok_kuning);
-            //     },
-            //     error: function(xhr, textStatus, errorThrown) {
-            //         console.error('AJAX error:', errorThrown);
-            //     }
-            // });
-
-            // Define a variable to keep track of the current page
-            let currentPage = 1;
-
-            // Function to fetch data for a given page
-            function fetchData(page) {
-                // Perform the AJAX request with the requestData
-                $.ajax({
-                    url: "{{ route('drawMaps') }}",
-                    method: 'GET',
-                    data: {
-                        ...requestData,
-                        page
-                    }, // Include the page parameter in the request data
-                    success: function(result) {
-                        var plot = JSON.parse(result);
-                        const RegResult = Object.entries(plot['blok']);
-                        const pokok = Object.entries(plot['pokok']);
-                        markersLayer.clearLayers(); // Clear markers layer only
-                        drawMaps(RegResult);
-                        // drawPokok(pokok);
-
-                        const pokok_kuning = Object.entries(plot['pokok_kuning']);
-                        const data = pokok_kuning[1][1];
-
-                        // drawPokok(pokok);
-                        // console.log(data);
-
-                        // Assuming your JSON data is stored in a variable called data
-                        for (var j = 0; j < data.length; j++) {
-                            var obj = data[j];
-                            var lat = obj.lat;
-                            var lon = obj.lon;
-                            var afd_nama = obj.blok;
-                            var kondisi = obj.kondisi;
-                            var status = obj.status;
-
-                            // Create an HTML string for the popup content
-                            var popupContent = `
-                                <strong>Blok:</strong> ${afd_nama}<br>
-                                <strong>Kondisi:</strong> ${kondisi}<br>
-                                <strong>Status:</strong> ${status}
-                            `;
-
-                            var marker = L.marker([lat, lon]).addTo(markersLayer);
-
-                            // Set the HTML content as the popup for the marker
-                            marker.bindPopup(popupContent);
-                        }
-                        currentPage = page;
-                        // console.log(`Page: ${page}`);
-                        // console.log(pokok_kuning);
-                    },
-                    error: function(xhr, textStatus, errorThrown) {
-                        console.error('AJAX error:', errorThrown);
-                    }
-                });
-            }
-
-            $('#loadNextPageButton').click(function() {
-                // Increment the current page number
-                currentPage++;
-
-                // Fetch data for the next page
-                fetchData(currentPage);
             });
+            // Perform the AJAX request with the requestData
+            $.ajax({
+                url: "{{ route('drawMaps') }}",
+                method: 'GET',
+                data: requestData,
+                success: function(result) {
+                    Swal.close();
+                    var plot = JSON.parse(result);
+                    const RegResult = Object.entries(plot['blok']);
+                    const pokok = Object.entries(plot['pokok']);
+                    const drawBlok = Object.entries(plot['drawBlok']);
+                    // console.log(result);
+                    var totalx = plot['total_pokok'];
+                    var total_ditangani = plot['total_ditangani'];
+                    var persen_ditangani = plot['persen_ditangani'];
+                    // console.log(totalx);
 
-            // Event listener for the "Load Prev Page" button
-            $('#loadPrevPageButton').click(function() {
-                // Check if currentPage is greater than 1 to avoid going to negative page numbers
-                if (currentPage > 1) {
-                    // Decrement the current page number
-                    currentPage--;
+                    const totalPkElement = document.getElementById("total_pk");
 
-                    // Fetch data for the previous page
-                    fetchData(currentPage);
+                    if (totalPkElement) {
+                        totalPkElement.textContent = totalx;
+                    } else {
+                        console.error("Element with id 'total_pk' not found.");
+                    }
+                    const total_ditanganix = document.getElementById("sembuh_pk");
+
+                    if (total_ditanganix) {
+                        total_ditanganix.textContent = total_ditangani;
+                    } else {
+                        console.error("Element with id 'total_pk' not found.");
+                    }
+                    const persen_ditanganix = document.getElementById("persen_pk");
+
+                    if (persen_ditanganix) {
+                        persen_ditanganix.textContent = persen_ditangani + '%';
+                    } else {
+                        console.error("Element with id 'total_pk' not found.");
+                    }
+
+
+                    drawMaps(RegResult);
+                    drawPokok(pokok);
+                    drawblok(drawBlok);
+
+
+
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.error('AJAX error:', errorThrown);
                 }
             });
-            // Initial data fetch (page 1)
-            fetchData(currentPage);
-
 
             // end ajax 
         });
@@ -671,7 +843,9 @@
         // end code 
     });
 
+    function drawMaps() {
 
+    }
     var defaultSelectedRegionalId = opt_reg[0].id;
 
 
@@ -682,4 +856,49 @@
 
 
     populateAfdelingOptions(defaultSelectedEstateEst);
+
+    // edit tool untuk gambar map 
+    // var drawnItems = new L.FeatureGroup();
+    // map.addLayer(drawnItems);
+
+    // var drawControl = new L.Control.Draw({
+    //     edit: {
+    //         featureGroup: drawnItems,
+    //         poly: {
+    //             allowIntersection: false
+    //         }
+    //     },
+    //     draw: {
+    //         polygon: {
+    //             allowIntersection: false,
+    //             showArea: true
+    //         }
+    //     }
+    // });
+    // map.addControl(drawControl);
+    // map.on('draw:created', function(e) {
+    //     var layer = e.layer;
+    //     drawnItems.addLayer(layer);
+
+    //     // Access the polygon's coordinates
+    //     var polygonCoordinates = layer.getLatLngs();
+    //     console.log('Polygon Coordinates:', polygonCoordinates);
+
+    //     $('#saveButton').click(function() {
+    //         // Assuming you have the coordinates in an array named 'polygonCoordinates'
+    //         var textData = polygonCoordinates.map(function(latLng) {
+    //             return 'est' + 'afd' + latLng.lat + ',' + latLng.lng;
+    //         }).join('\n');
+
+    //         // Create a Blob with the text data and save it as a TXT file
+    //         var blob = new Blob([textData], {
+    //             type: 'text/plain;charset=utf-8'
+    //         });
+
+    //         // Save the Blob as a TXT file
+    //         saveAs(blob, 'coordinates.txt');
+    //     });
+    // });
+
+    // end edit tool gambar map 
 </script>
