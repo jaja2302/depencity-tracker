@@ -29,6 +29,8 @@ class TrackerController extends Controller
 
         $filterEst = json_decode($filterEst, true);
 
+        // dd($filterEst, $optionREg);
+
         $filterAfd = DB::connection('mysql2')->table('afdeling')
             ->select('afdeling.*', 'estate.est')
             ->join('estate', 'estate.id', '=', 'afdeling.estate')
@@ -37,9 +39,34 @@ class TrackerController extends Controller
         $filterAfd = json_decode($filterAfd, true);
 
 
+        $filterblok = DB::connection('mysql2')->table('blok')
+            ->select('blok.*', 'estate.est')
+            ->join('afdeling', 'afdeling.id', '=', 'blok.afdeling')
+            ->join('estate', 'estate.id', '=', 'afdeling.estate')
+            ->get();
 
-        // dd($filterEst, $filterAfd);
+        $filterblok = json_decode($filterblok, true);
 
+        // $uniqueNamas now contains the unique "nama" values
+        $uniqueNamas = [];
+
+        // Filter the array to remove elements with duplicate "nama" values
+        $filteredData = array_filter($filterblok, function ($item) use (&$uniqueNamas) {
+            if (!in_array($item['nama'], $uniqueNamas)) {
+                $uniqueNamas[] = $item['nama'];
+                return true;
+            }
+            return false;
+        });
+
+        // Reindex the array with numeric indices (0, 1, 2, 3, etc.)
+        $filteredData = array_values($filteredData);
+
+        // Now $filteredData contains the filtered array with numeric indices
+
+
+        // dd($filteredData);
+        // dd($filterAfd);
         $perum = DB::connection('mysql2')->table('perumahan')
             ->select(DB::raw('DISTINCT YEAR(datetime) as year'))
             ->orderBy('year', 'asc')
@@ -56,6 +83,7 @@ class TrackerController extends Controller
             'option_reg' => $optionREg,
             'option_est' => $filterEst,
             'option_afd' => $filterAfd,
+            'option_blok' => $filteredData,
             'list_tahun' => $years
         ]);
     }

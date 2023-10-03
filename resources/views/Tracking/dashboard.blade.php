@@ -170,12 +170,12 @@
                 <div class="option-select" id="afdeling-option" style="display: none;">
                     <!-- Additional options for Afdeling -->
                     <label class="main-title" style="font-size: 18px;">Pilih Afdeling:</label>
-                    <select class="form-control" id="afd"></select>
+                    <select class="form-control" id="afd" onchange="populatbloks(this.value)"></select>
                 </div>
                 <div class="option-select" id="blok-option" style="display: none;">
                     <!-- Additional options for Blok -->
                     <label class="main-title" style="font-size: 18px;">Pilih Blok:</label>
-                    <select class="form-control" id="bloxk"></select>
+                    <select class="form-control" id="blokxaxa"></select>
                 </div>
             </div>
         </div>
@@ -265,76 +265,101 @@
     var opt_reg = <?php echo json_encode($option_reg); ?>;
     var opt_est = <?php echo json_encode($option_est); ?>;
     var opt_afd = <?php echo json_encode($option_afd); ?>;
+    var opt_blok = <?php echo json_encode($option_blok); ?>;
+
+    // console.log(opt_blok);
+
+    var regional = document.getElementById('afdreg');
+    var estate_sl = document.getElementById('est');
+    var afdeling_sl = document.getElementById('afd');
+    var blok_sl = document.getElementById('blokxaxa');
 
 
-    var afdregSelect = document.getElementById('afdreg');
 
-    // Function to populate the select element with options
-    function populateSelect(options) {
+    // Function to populate a select element with options
+    function populateSelect(selectElement, options) {
         // Clear existing options
-        afdregSelect.innerHTML = '';
+        selectElement.innerHTML = '';
 
         // Create and add new options
         options.forEach(function(option) {
             var optionElement = document.createElement('option');
             optionElement.value = option.id;
             optionElement.textContent = option.nama;
-            afdregSelect.appendChild(optionElement);
+            selectElement.appendChild(optionElement);
         });
     }
 
-    populateSelect(opt_reg);
-
-    // Get the default selected Regional option (for example, the first option)
-    var defaultSelectedRegionalId = opt_reg[0].id;
-
-    // Populate the Estate options based on the default selected Regional option
-    populateEstateOptions(defaultSelectedRegionalId);
+    populateSelect(regional, opt_reg);
 
 
-    function populateEstateOptions(selectedRegionalId) {
-        // Get a reference to the Estate select element
-        var estateSelect = document.getElementById('est');
 
+
+    function populateEstateOptions(estateSelcted) {
         // Clear existing options
-        estateSelect.innerHTML = '';
 
-        // Filter the opt_est array based on the selectedRegionalId
+        // console.log(selectedWilIdx);
+        estate_sl.innerHTML = '';
+
+        // Filter the opt_est array based on the selectedWilIdx
         var filteredEstates = opt_est.filter(function(estate) {
-            return estate.regional == selectedRegionalId; // Use '==' for loose equality
+            return estate.regional == estateSelcted;
         });
-
-        // Create and add new options based on the filtered results
         filteredEstates.forEach(function(estate) {
             var optionElement = document.createElement('option');
             optionElement.value = estate.est;
             optionElement.textContent = estate.nama;
-            estateSelect.appendChild(optionElement);
+            estate_sl.appendChild(optionElement);
         });
+
+
+
+        estate_sl.dispatchEvent(new Event('change'));
     }
 
-    function populateAfdelingOptions(selectedEstateEst) {
-        // Get a reference to the Afdeling select element
-        var afdSelect = document.getElementById('afd');
-
+    function populateAfdelingOptions(afdelingSelected) {
         // Clear existing options
-        afdSelect.innerHTML = '';
-        // console.log(selectedEstateEst);
-        // Filter the opt_afd array based on the selectedEstateEst
-        var filteredAfdelings = opt_afd.filter(function(afd) {
-            return afd.est === selectedEstateEst; // Use '===' for strict equality
 
+        // console.log(selectedWilIdx);
+        afdeling_sl.innerHTML = '';
 
+        // Filter the opt_est array based on the selectedWilIdx
+        var filteredEstates = opt_afd.filter(function(estate) {
+            return estate.est == afdelingSelected;
         });
-
-        // Create and add new options based on the filtered results
-        filteredAfdelings.forEach(function(afd) {
+        filteredEstates.forEach(function(estate) {
             var optionElement = document.createElement('option');
-            optionElement.value = afd.id;
-            optionElement.textContent = afd.nama;
-            afdSelect.appendChild(optionElement);
+            optionElement.value = estate.id;
+            optionElement.textContent = estate.nama;
+            afdeling_sl.appendChild(optionElement);
         });
+
+
+
+        afdeling_sl.dispatchEvent(new Event('change'));
     }
+
+    function populatbloks(afdelingSelected) {
+        // Clear existing options
+        blok_sl.innerHTML = '';
+
+        // Filter the opt_blok array based on the selected afdeling
+        var filteredEstates = opt_blok.filter(function(estate) {
+            return estate.afdeling == afdelingSelected;
+        });
+
+        // console.log(filteredEstates);
+
+        filteredEstates.forEach(function(estate) {
+            var optionElement = document.createElement('option');
+            optionElement.value = estate['nama']; // Use estate['nama'] to access the property
+            optionElement.textContent = estate['nama']; // Use estate['nama'] to access the property
+            blok_sl.appendChild(optionElement);
+        });
+
+        blok_sl.dispatchEvent(new Event('change'));
+    }
+
 
 
 
@@ -686,6 +711,8 @@
                 // Handle any other cases or defaults here
             }
         }
+
+
         // Listen for changes in the radio buttons
         $('input[name="option"]').on('change', function() {
             var selectedOption = $(this).val();
@@ -694,58 +721,58 @@
             showAdditionalOptions(selectedOption);
 
             // If "Blok" is selected, populate the Blok options initially
-            if (selectedOption === 'Blok') {
-                var selectedAfdId = $('#afd').val();
+            // if (selectedOption === 'Blok') {
+            //     var selectedAfdId = $('#afd').val();
 
-                console.log(selectedAfdId);
-                populateBlokOptions(selectedAfdId);
-            }
+            //     // console.log(selectedAfdId);
+            //     populateBlokOptions(selectedAfdId);
+            // }
         });
-        $('#afd').on('change', function() {
-            // Get the selected Afdeling value
-            var selectedAfdId = $(this).val();
+        // $('#afd').on('change', function() {
+        //     // Get the selected Afdeling value
+        //     var selectedAfdId = $(this).val();
 
-            // Call the function to populate Blok options when "Blok" is selected
-            var selectedOption = $('input[name="option"]:checked').val();
-            if (selectedOption === 'Blok') {
-                populateBlokOptions(selectedAfdId);
-            }
-        });
+        //     // Call the function to populate Blok options when "Blok" is selected
+        //     var selectedOption = $('input[name="option"]:checked').val();
+        //     if (selectedOption === 'Blok') {
+        //         populateBlokOptions(selectedAfdId);
+        //     }
+        // });
 
-        function populateBlokOptions(selectedAfdId) {
-            var blokSelect = $('#bloxk'); // Select the element by ID
+        // function populateBlokOptions(selectedAfdId) {
+        //     var blokSelect = $('#bloxk'); // Select the element by ID
 
 
-            // Send an AJAX request to fetch data based on the selected Afdeling
-            $.ajax({
-                url: "{{ route('getBlok') }}",
-                method: 'GET',
-                data: {
-                    afd: selectedAfdId
-                },
-                success: function(result) {
-                    var parseResult = JSON.parse(result);
-                    var blokArray = parseResult.blok; // Access the "blok" array within the object
+        //     // Send an AJAX request to fetch data based on the selected Afdeling
+        //     $.ajax({
+        //         url: "{{ route('getBlok') }}",
+        //         method: 'GET',
+        //         data: {
+        //             afd: selectedAfdId
+        //         },
+        //         success: function(result) {
+        //             var parseResult = JSON.parse(result);
+        //             var blokArray = parseResult.blok; // Access the "blok" array within the object
 
-                    // Clear any existing options
-                    blokSelect.empty();
+        //             // Clear any existing options
+        //             blokSelect.empty();
 
-                    // Iterate over the "blokArray" array and add options to the select element
-                    blokArray.forEach(function(blokData) {
-                        blokSelect.append($('<option>', {
-                            value: blokData.nama,
-                            text: blokData.nama
-                        }));
-                    });
+        //             // Iterate over the "blokArray" array and add options to the select element
+        //             blokArray.forEach(function(blokData) {
+        //                 blokSelect.append($('<option>', {
+        //                     value: blokData.nama,
+        //                     text: blokData.nama
+        //                 }));
+        //             });
 
-                    // Show the "blok" select element
-                    $('#blok-option').show();
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    console.error('AJAX error:', errorThrown);
-                }
-            });
-        }
+        //             // Show the "blok" select element
+        //             $('#blok-option').show();
+        //         },
+        //         error: function(xhr, textStatus, errorThrown) {
+        //             console.error('AJAX error:', errorThrown);
+        //         }
+        //     });
+        // }
 
         $('#btnShow').on('click', function() {
             var selectedOption = $('input[name="option"]:checked').val();
@@ -769,7 +796,7 @@
                 requestData['regional'] = $('#afdreg').val();
                 requestData['estate'] = $('#est').val();
                 requestData['afdeling'] = $('#afd').val();
-                requestData['blok'] = $('#bloxk').val();
+                requestData['blok'] = $('#blokxaxa').val();
                 dataType = 'blok';
             }
 
