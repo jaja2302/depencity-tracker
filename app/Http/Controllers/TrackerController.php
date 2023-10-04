@@ -44,28 +44,26 @@ class TrackerController extends Controller
             ->join('afdeling', 'afdeling.id', '=', 'blok.afdeling')
             ->join('estate', 'estate.id', '=', 'afdeling.estate')
             ->get();
-
+        // $filterblok = $filterblok->groupBy(['afdeling']);
         $filterblok = json_decode($filterblok, true);
 
-        // $uniqueNamas now contains the unique "nama" values
+
+        $uniqueItems = [];
         $uniqueNamas = [];
 
-        // Filter the array to remove elements with duplicate "nama" values
-        $filteredData = array_filter($filterblok, function ($item) use (&$uniqueNamas) {
-            if (!in_array($item['nama'], $uniqueNamas)) {
-                $uniqueNamas[] = $item['nama'];
-                return true;
+        foreach ($filterblok as $item) {
+            $nama = $item['nama'];
+            $afdeling = $item['afdeling'];
+            $key = $nama . '_' . $afdeling; // Create a unique key based on "nama" and "afdeling"
+
+            // Check if the key is already in the $uniqueNamas array
+            if (!in_array($key, $uniqueNamas)) {
+                $uniqueNamas[] = $key; // Add the unique key to the $uniqueNamas array
+                $uniqueItems[] = $item; // Add the item to the $uniqueItems array
             }
-            return false;
-        });
-
-        // Reindex the array with numeric indices (0, 1, 2, 3, etc.)
-        $filteredData = array_values($filteredData);
-
-        // Now $filteredData contains the filtered array with numeric indices
+        }
 
 
-        // dd($filteredData);
         // dd($filterAfd);
         $perum = DB::connection('mysql2')->table('perumahan')
             ->select(DB::raw('DISTINCT YEAR(datetime) as year'))
@@ -83,7 +81,7 @@ class TrackerController extends Controller
             'option_reg' => $optionREg,
             'option_est' => $filterEst,
             'option_afd' => $filterAfd,
-            'option_blok' => $filteredData,
+            'option_blok' => $uniqueItems,
             'list_tahun' => $years
         ]);
     }
@@ -159,7 +157,7 @@ class TrackerController extends Controller
                 // untuk draw map 
                 $plotEst = DB::connection('mysql2')
                     ->table('estate_plot')
-                    ->select('estate_plot.*', 'wil.regional')
+                    ->select('estate_plot.*', 'wil.regional', 'wil.nama as nama')
                     ->join('estate', 'estate.est', '=', 'estate_plot.est')
                     ->join('wil', 'wil.id', '=', 'estate.wil')
                     ->where('wil.regional', '=', $regional)
@@ -220,14 +218,11 @@ class TrackerController extends Controller
                 $drawBlok = json_decode($drawBlok, true);
 
                 // dd($plotBlok);
+                $values = [];
 
 
-
+                $arrView['datatables'] = $values;
                 $arrView['drawBlok'] = $drawBlok;
-
-
-
-
                 $arrView['total_pokok'] = $count;
                 $arrView['total_ditangani'] = $count_sudah;
                 $arrView['persen_ditangani'] = $percentage_sudah;
@@ -241,7 +236,8 @@ class TrackerController extends Controller
 
                 $plotEst = DB::connection('mysql2')
                     ->table('estate_plot')
-                    ->select('estate_plot.*')
+                    ->select('estate_plot.*', 'estate.nama as nama')
+                    ->join('estate', 'estate.est', '=', 'estate_plot.est')
                     ->where('estate_plot.est', '=', $estate)
                     // ->whereNotIn('id', [353])
                     ->orderBy('id', 'desc') // Sort by 'id' column in descending order
@@ -277,7 +273,7 @@ class TrackerController extends Controller
                     }));
                 }, 0);
 
-                // dd($count);
+                // dd($plot_kuning);
 
 
 
@@ -304,7 +300,11 @@ class TrackerController extends Controller
                 // dd($drawBlok);
 
 
+                $values = [];
 
+
+
+                $arrView['datatables'] = $values;
                 $arrView['drawBlok'] = $drawBlok;
                 $arrView['total_pokok'] = $count;
                 $arrView['total_ditangani'] = $count_sudah;
@@ -332,6 +332,9 @@ class TrackerController extends Controller
                 $plotAfd = $plotAfd->groupBy(['nama']);
 
 
+                // dd($plotAfd);
+
+
 
                 $plot_kuning = DB::connection('mysql2')
                     ->table('deficiency_tracker')
@@ -346,7 +349,10 @@ class TrackerController extends Controller
                 $plot_kuning = $plot_kuning->groupBy(['est']);
                 $plot_kuning = json_decode($plot_kuning, true);
 
-                // dd($plot_kuning, $afdeling);
+                // dd($plot_kuning[7563]);
+
+
+
 
                 $count = array_reduce($plot_kuning, function ($carry, $items) {
                     return $carry + count(array_filter($items, function ($item) {
@@ -385,7 +391,10 @@ class TrackerController extends Controller
                 $drawBlok = json_decode($drawBlok, true);
 
 
+                $values = reset($plot_kuning);
 
+
+                $arrView['datatables'] = $values;
 
                 $arrView['drawBlok'] = $drawBlok;
 
@@ -412,19 +421,30 @@ class TrackerController extends Controller
                 $plotBlok = $plotBlok->groupBy(['est']);
                 $plotBlok = json_decode($plotBlok, true);
 
+                // dd($blok);
+                if ($regional == 2) {
+                    $inputString = $blok;
+                    $modifiedString = preg_replace('/0/', '', $inputString, 1);
+                } else {
+
+                    $modifiedString = $blok;
+                }
+
+                // dd($modifiedString);
+
                 $plot_kuning = DB::connection('mysql2')
                     ->table('deficiency_tracker')
                     ->select('deficiency_tracker.*')
                     ->where('deficiency_tracker.est', '=', $estate)
-                    // ->where('deficiency_tracker.afd', '=', $afdeling)
-                    ->where('deficiency_tracker.blok', 'LIKE', '%' . $blok . '%') // Use LIKE with % to match partial strings
+                    ->where('deficiency_tracker.blok', 'LIKE', '%' . $modifiedString . '%')
+                    // ->where('deficiency_tracker.blok', '=', 'D02')
                     ->orderBy('id', 'desc')
                     ->get();
 
 
                 $plot_kuning = $plot_kuning->groupBy(['est']);
                 $plot_kuning = json_decode($plot_kuning, true);
-                // dd($plot_kuning, $blok);
+                // dd($plot_kuning, $blok, $estate);
                 $count = array_reduce($plot_kuning, function ($carry, $items) {
                     return $carry + count(array_filter($items, function ($item) {
                         return $item['status'] !== "Sudah";
@@ -459,11 +479,12 @@ class TrackerController extends Controller
 
                 $drawBlok = $drawBlok->groupBy(['nama']);
                 $drawBlok = json_decode($drawBlok, true);
+                $values = [];
 
+
+                $arrView['datatables'] = $values;
 
                 $arrView['drawBlok'] = $drawBlok;
-
-
                 $arrView['total_pokok'] = $count;
                 $arrView['total_ditangani'] = $count_sudah;
                 $arrView['persen_ditangani'] = $percentage_sudah;
@@ -479,5 +500,18 @@ class TrackerController extends Controller
 
         echo json_encode($arrView);
         exit();
+    }
+
+    public function updateUserqc(Request $request)
+    {
+        $id = $request->input('id');
+        $blok = $request->input('blok');
+
+        // dd($id, $blok);
+
+        DB::connection('mysql2')->table('deficiency_tracker')
+            ->where('id', $id)->update([
+                'blok' => $blok,
+            ]);
     }
 }

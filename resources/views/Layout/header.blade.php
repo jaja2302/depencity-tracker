@@ -85,18 +85,25 @@
 
         <div class="main-wrapper">
             <!-- ! Main nav -->
+            <style>
+                /* CSS for center-aligning the title */
+                .center-title {
+                    text-align: center;
+                    margin: 0 auto;
+                    /* This centers the element horizontally */
+                }
+            </style>
             <nav class="main-nav--bg">
                 <div class="container main-nav">
                     <div class="main-nav-start">
                         <div class="search-wrapper">
                             <i data-feather="search" aria-hidden="true"></i>
-
                             <input type="text" placeholder="Selamat Datang {{ session('user_name') }} " required>
                         </div>
                     </div>
                     <div class="lang-switcher-wrapper">
-                        <h1 class="main-title">Tracking Plot Kuning</h1>
-
+                        <!-- Add a CSS class for center alignment -->
+                        <h1 class="main-title center-title">Tracking Plot Kuning</h1>
                     </div>
                     <div class="main-nav-end">
                         <button class="sidebar-toggle transparent-btn" title="Menu" type="button">
@@ -108,11 +115,10 @@
                             <i class="sun-icon" data-feather="sun" aria-hidden="true"></i>
                             <i class="moon-icon" data-feather="moon" aria-hidden="true"></i>
                         </button>
-
-
                     </div>
                 </div>
             </nav>
+
 
 
             <main class="main users chart-page" id="skip-target">

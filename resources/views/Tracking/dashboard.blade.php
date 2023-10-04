@@ -13,8 +13,9 @@
         <div class="col-md-6 col-xl-4">
             <article class="stat-cards-item">
                 <div class="stat-cards-icon primary">
-                    <i data-feather="bar-chart-2" aria-hidden="true"></i>
+                    <img src="{{ asset('img/pokok_kuning.png') }}" alt="Custom Icon">
                 </div>
+
                 <div class="stat-cards-info">
                     <p class="stat-cards-info__num" id="total_pk"></p>
                     <p class="stat-cards-info__title">Total Pokok Kuning</p>
@@ -29,8 +30,8 @@
         </div>
         <div class="col-md-6 col-xl-4">
             <article class="stat-cards-item">
-                <div class="stat-cards-icon warning">
-                    <i data-feather="file" aria-hidden="true"></i>
+                <div class="stat-cards-icon primary">
+                    <img src="{{ asset('img/pokok_sembuh.png') }}" alt="Custom Icon">
                 </div>
                 <div class="stat-cards-info">
                     <p class="stat-cards-info__num" id="sembuh_pk"></p>
@@ -46,8 +47,8 @@
         </div>
         <div class="col-md-6 col-xl-4">
             <article class="stat-cards-item">
-                <div class="stat-cards-icon purple">
-                    <i data-feather="file" aria-hidden="true"></i>
+                <div class="stat-cards-icon primary">
+                    <img src="{{ asset('img/percens.png') }}" alt="Custom Icon">
                 </div>
                 <div class="stat-cards-info">
                     <p class="stat-cards-info__num" id="persen_pk"></p>
@@ -122,6 +123,10 @@
     </style>
 
     <div class="row mt-10">
+
+
+
+
         <div class="col-lg-12">
             <div class="radio-group">
                 <!-- Radio button for "Regional" -->
@@ -184,6 +189,26 @@
             <div id="map" style="height: 540px; z-index: 1;"></div>
 
         </div>
+
+        <br>
+        @if(session('user_name') == 'Aan Syahputra')
+        <div class="col-sm-12">
+            <div class="table-responsive">
+                <h1 style="text-align: center;">Edit Nama Blok</h1>
+
+                <table class="table table-striped table-bordered" id="user_qc" style="background-color: white;">
+                    <thead>
+                        <!-- Table header content -->
+                    </thead>
+                    <tbody>
+                        <!-- Table body content will be dynamically generated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
+
     </div>
 
 
@@ -220,6 +245,18 @@
             padding: 0;
             /* Adjust padding as needed */
         }
+
+        .custom-popup {
+            text-align: center;
+            /* Center-align the content */
+        }
+
+        .popup-image {
+            max-width: 100%;
+            /* Ensure images fit within the popup */
+            height: auto;
+            /* Maintain aspect ratio */
+        }
     </style>
 
 
@@ -248,8 +285,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
 
+<!-- datables  -->
+<link href="https://cdn.datatables.net/v/dt/dt-1.13.6/datatables.min.css" rel="stylesheet">
 
+<script src="https://cdn.datatables.net/v/dt/dt-1.13.6/datatables.min.js"></script>
 <script>
+    let user_name = "{{ session('user_name') }}";
+
+
     function openModal(src, komentar) {
         Swal.fire({
             imageUrl: src,
@@ -342,7 +385,7 @@
     function populatbloks(afdelingSelected) {
         // Clear existing options
         blok_sl.innerHTML = '';
-
+        // console.log(afdelingSelected);
         // Filter the opt_blok array based on the selected afdeling
         var filteredEstates = opt_blok.filter(function(estate) {
             return estate.afdeling == afdelingSelected;
@@ -376,7 +419,7 @@
 
         // Define the "Google Satellite" tile layer
         var googleSatellite = L.tileLayer('http://{s}.google.com/vt?lyrs=s&x={x}&y={y}&z={z}', {
-            maxZoom: 20,
+            maxZoom: 22, // Increase the maxZoom value to 22 or any desired value
             subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
         });
 
@@ -393,44 +436,44 @@
         map.removeLayer(markerBlok); // Hide Draw Blok initially
 
         // Define a unique ID for the legend container
-        var legendId = 'legend-container2';
+        // var legendId = 'legend-container2';
 
-        // Remove the previous legend if it exists
-        var existingLegend = document.getElementById(legendId);
-        if (existingLegend) {
-            existingLegend.remove();
-        }
+        // // Remove the previous legend if it exists
+        // var existingLegend = document.getElementById(legendId);
+        // if (existingLegend) {
+        //     existingLegend.remove();
+        // }
 
-        // Define the legend control
-        var legend = L.control({
-            position: 'bottomleft'
-        });
+        // // Define the legend control
+        // var legend = L.control({
+        //     position: 'bottomleft'
+        // });
 
-        legend.onAdd = function(map) {
-            var div = L.DomUtil.create('div', 'info legend');
-            div.id = legendId; // Set the unique ID
-            div.innerHTML = '<strong>Legend</strong><br>';
-            div.innerHTML += '<label for="drawMapsCheckbox"><input type="radio" name="mapToggle" id="drawMapsCheckbox" checked> Draw Maps</label><br>';
-            div.innerHTML += '<label for="drawblokCheckbox"><input type="radio" name="mapToggle" id="drawblokCheckbox"> Draw Blok</label><br>';
-            return div;
-        };
+        // legend.onAdd = function(map) {
+        //     var div = L.DomUtil.create('div', 'info legend');
+        //     div.id = legendId; // Set the unique ID
+        //     div.innerHTML = '<strong>Legend</strong><br>';
+        //     div.innerHTML += '<label for="drawMapsCheckbox"><input type="radio" name="mapToggle" id="drawMapsCheckbox" checked> Draw Maps</label><br>';
+        //     div.innerHTML += '<label for="drawblokCheckbox"><input type="radio" name="mapToggle" id="drawblokCheckbox"> Draw Blok</label><br>';
+        //     return div;
+        // };
 
-        legend.addTo(map);
+        // legend.addTo(map);
 
-        // Add event listeners to the radio buttons
-        document.getElementById('drawMapsCheckbox').addEventListener('change', function() {
-            if (this.checked) {
-                map.addLayer(areaMapsLayer);
-                map.removeLayer(markerBlok);
-            }
-        });
+        // // Add event listeners to the radio buttons
+        // document.getElementById('drawMapsCheckbox').addEventListener('change', function() {
+        //     if (this.checked) {
+        //         map.addLayer(areaMapsLayer);
+        //         map.removeLayer(markerBlok);
+        //     }
+        // });
 
-        document.getElementById('drawblokCheckbox').addEventListener('change', function() {
-            if (this.checked) {
-                map.addLayer(markerBlok);
-                // map.removeLayer(areaMapsLayer);
-            }
-        });
+        // document.getElementById('drawblokCheckbox').addEventListener('change', function() {
+        //     if (this.checked) {
+        //         map.addLayer(markerBlok);
+        //         // map.removeLayer(areaMapsLayer);
+        //     }
+        // });
 
 
 
@@ -452,7 +495,7 @@
                         var obj = regionData[j];
                         var lat = obj.lat;
                         var lon = obj.lon;
-                        var afd_nama = obj.afd_nama;
+                        var afd_nama = obj.nama;
 
                         // Create a LatLng object for each coordinate
                         var latLng = new L.LatLng(lat, lon);
@@ -467,6 +510,16 @@
                     var polygon = L.polygon(coordinates, {
                         fillOpacity: 0.2, // Set the fill opacity to a low value
                         opacity: 0.5 // Set the border opacity to a low value
+                    }).addTo(areaMapsLayer);
+
+                    var polygonCenter = polygon.getBounds().getCenter();
+
+                    var label = L.marker(polygonCenter, {
+                        icon: L.divIcon({
+                            className: 'label-blok',
+                            html: afd_nama,
+                            iconSize: [50, 10],
+                        })
                     }).addTo(areaMapsLayer);
                 }
             }
@@ -498,7 +551,7 @@
             });
 
             var iconSembuh = L.icon({
-                iconUrl: '{{ asset("img/sembuhnih.png") }}',
+                iconUrl: '{{ asset("img/circle_sudah.png") }}',
                 iconSize: [32, 32],
             });
 
@@ -588,6 +641,7 @@
                             var komentar = obj.komentar;
                             var id = obj.id;
 
+                            console.log(foto);
                             if ((statusFilter === "all" || statusFilter === status) && (kondisiFilter === "all" || kondisiFilter === kondisi)) {
                                 var icon;
                                 if (status === 'Sudah') {
@@ -604,14 +658,18 @@
                                         icon = defaultIcon;
                                     }
                                 }
-
-                                var popupContent = `<strong>Dtracking Blok: </strong>${afd_nama}<br/>`;
+                                var popupContent = `<div class="custom-popup"><strong>Dtracking Blok: </strong>${afd_nama}<br/>`;
                                 popupContent += `<strong>Kondisi: </strong>${kondisi}<br/>`;
                                 popupContent += `<strong>Status: </strong>${status}<br/>`;
                                 popupContent += `<strong>ID: </strong>${id}<br/>`;
+
                                 if (foto) {
-                                    popupContent += `<img src="https://mobilepro.srs-ssms.com/storage/app/public/deficiency_tracker/${foto}" alt="Foto Temuan" style="max-width:200px; height:auto;" onclick="openModal(this.src, '${komentar}')"><br/>`;
+                                    var fotoArray = foto.split('$'); // Split the images by '$' delimiter
+                                    for (var k = 0; k < fotoArray.length; k++) {
+                                        popupContent += `<img class="popup-image" src="https://mobilepro.srs-ssms.com/storage/app/public/deficiency_tracker/${fotoArray[k]}" alt="Foto Temuan" onclick="openModal(this.src, '${komentar}')"><br/>`;
+                                    }
                                 }
+                                popupContent += '</div>'; // Close the custom-popup div
 
                                 var marker = L.marker([lat, lon], {
                                     icon: icon
@@ -728,51 +786,7 @@
             //     populateBlokOptions(selectedAfdId);
             // }
         });
-        // $('#afd').on('change', function() {
-        //     // Get the selected Afdeling value
-        //     var selectedAfdId = $(this).val();
 
-        //     // Call the function to populate Blok options when "Blok" is selected
-        //     var selectedOption = $('input[name="option"]:checked').val();
-        //     if (selectedOption === 'Blok') {
-        //         populateBlokOptions(selectedAfdId);
-        //     }
-        // });
-
-        // function populateBlokOptions(selectedAfdId) {
-        //     var blokSelect = $('#bloxk'); // Select the element by ID
-
-
-        //     // Send an AJAX request to fetch data based on the selected Afdeling
-        //     $.ajax({
-        //         url: "{{ route('getBlok') }}",
-        //         method: 'GET',
-        //         data: {
-        //             afd: selectedAfdId
-        //         },
-        //         success: function(result) {
-        //             var parseResult = JSON.parse(result);
-        //             var blokArray = parseResult.blok; // Access the "blok" array within the object
-
-        //             // Clear any existing options
-        //             blokSelect.empty();
-
-        //             // Iterate over the "blokArray" array and add options to the select element
-        //             blokArray.forEach(function(blokData) {
-        //                 blokSelect.append($('<option>', {
-        //                     value: blokData.nama,
-        //                     text: blokData.nama
-        //                 }));
-        //             });
-
-        //             // Show the "blok" select element
-        //             $('#blok-option').show();
-        //         },
-        //         error: function(xhr, textStatus, errorThrown) {
-        //             console.error('AJAX error:', errorThrown);
-        //         }
-        //     });
-        // }
 
         $('#btnShow').on('click', function() {
             var selectedOption = $('input[name="option"]:checked').val();
@@ -812,6 +826,9 @@
                 }
 
             });
+            if ($.fn.DataTable.isDataTable('#user_qc')) {
+                $('#user_qc').DataTable().destroy();
+            }
             // Perform the AJAX request with the requestData
             $.ajax({
                 url: "{{ route('drawMaps') }}",
@@ -855,6 +872,92 @@
                     drawMaps(RegResult);
                     drawPokok(pokok);
                     drawblok(drawBlok);
+
+
+                    var listQC = $('#user_qc').DataTable({
+                        columns: [{
+                                title: 'ID',
+                                data: 'id',
+                            },
+                            {
+                                title: 'Estate',
+                                data: 'est',
+                            },
+                            {
+                                title: 'Afdeling',
+                                data: 'afd',
+                            },
+                            {
+                                title: 'Blok',
+                                data: 'blok',
+                            },
+                            {
+                                // -1 targets the last column
+                                title: 'Actions',
+                                visible: (user_name === 'Aan Syahputra'),
+                                render: function(data, type, row, meta) {
+                                    var buttons =
+                                        '<button class="edit-btn">Edit</button>'
+                                    return buttons;
+                                }
+                            }
+                        ],
+
+                    });
+
+                    // Populate DataTable with data
+                    listQC.clear().rows.add(plot['datatables']).draw();
+
+                    $('#user_qc').on('click', '.edit-btn', function() {
+                        var rowData = listQC.row($(this).closest('tr')).data();
+                        var rowIndex = listQC.row($(this).closest('tr')).index();
+                        editqc(rowIndex);
+                    });
+
+                    function editqc(id) {
+                        selectedRowIndex = id;
+                        var rowData = listQC.row(id).data();
+                        var blok = rowData.blok;
+                        var _token = $('input[name="_token"]').val();
+
+                        Swal.fire({
+                            title: 'Masukan Blok',
+                            input: 'text',
+                            inputLabel: 'Edit nama Blok',
+                            inputValue: blok,
+                            inputAttributes: {
+                                maxlength: 50,
+                                autocapitalize: 'off',
+                                autocorrect: 'off'
+                            },
+                            showCancelButton: true,
+                            confirmButtonText: 'Save', // Change the text of the confirm button to "Save"
+                            showLoaderOnConfirm: true, // Show a loading spinner on the confirm button
+                            preConfirm: (newBlok) => { // Handle the confirmation
+                                return $.ajax({
+                                    type: 'POST',
+                                    url: '{{ route("updateUserqc") }}',
+                                    data: {
+                                        id: rowData.id,
+                                        blok: newBlok, // Use the new value entered by the user
+                                    },
+                                    headers: {
+                                        'X-CSRF-TOKEN': _token
+                                    }
+                                });
+                            },
+                            allowOutsideClick: () => !Swal.isLoading() // Prevent closing the dialog while loading
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                Swal.fire('Disimpan!', 'User QC sudah diupdate!', 'success');
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 3000); // 3000 milliseconds = 3 seconds
+                            } else if (result.isDenied) {
+                                Swal.fire('Batal', 'Pengeditan dibatalkan.', 'info');
+                            }
+                        });
+                    }
 
 
 
