@@ -514,6 +514,10 @@
                 iconUrl: '{{ asset("img/circle_sudah.png") }}',
                 iconSize: [32, 32],
             });
+            var verified = L.icon({
+                iconUrl: '{{ asset("img/verified.png") }}',
+                iconSize: [32, 32],
+            });
 
             var legendId = 'legend-container'; // Unique ID for the legend container
 
@@ -534,6 +538,7 @@
                 div.innerHTML += '<strong>Status:</strong><br>';
                 div.innerHTML += '<label><input type="radio" name="statusFilter" value="all" checked> All</label><br>';
                 div.innerHTML += '<label><input type="radio" name="statusFilter" value="Sudah"> Sudah</label><br>';
+                div.innerHTML += '<label><input type="radio" name="statusFilter" value="Terverifikasi"> Terverifikasi</label><br>';
                 div.innerHTML += '<strong>Kondisi:</strong><br>';
                 div.innerHTML += '<label><input type="radio" name="kondisiFilter" value="all" checked> All</label><br>';
                 div.innerHTML += '<label><input type="radio" name="kondisiFilter" value="Berat"> Berat</label><br>';
@@ -601,11 +606,12 @@
                             var komentar = obj.komentar;
                             var id = obj.id;
 
-                            // console.log(foto);
                             if ((statusFilter === "all" || statusFilter === status) && (kondisiFilter === "all" || kondisiFilter === kondisi)) {
                                 var icon;
                                 if (status === 'Sudah') {
                                     icon = iconSembuh;
+                                } else if (status === 'Terverifikasi') {
+                                    icon = verified;
                                 } else {
                                     if (kondisi === 'Berat') {
                                         icon = beratIcon;
@@ -624,9 +630,10 @@
                                 popupContent += `<strong>ID: </strong>${id}<br/>`;
 
                                 if (foto) {
-                                    var fotoArray = foto.split('$'); // Split the images by '$' delimiter
+                                    var fotoArray = foto.split('$');
+                                    var komentararray = komentar.split('$');
                                     for (var k = 0; k < fotoArray.length; k++) {
-                                        popupContent += `<img class="popup-image" src="https://mobilepro.srs-ssms.com/storage/app/public/deficiency_tracker/${fotoArray[k]}" alt="Foto Temuan" onclick="openModal(this.src, '${komentar}')"><br/>`;
+                                        popupContent += `<img class="popup-image" src="https://mobilepro.srs-ssms.com/storage/app/public/deficiency_tracker/${fotoArray[k]}" alt="Foto Temuan" onclick="openModal(this.src, '${komentararray}')"><br/>`;
                                     }
                                 }
                                 popupContent += '</div>'; // Close the custom-popup div
@@ -640,6 +647,7 @@
                     }
                 }
             }
+
 
             updateMarkers(); // Initially display all markers
         }
