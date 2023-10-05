@@ -220,7 +220,9 @@ class TrackerController extends Controller
                 // dd($plotBlok);
                 $values = [];
 
+                $new_blok = [];
 
+                $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $values;
                 $arrView['drawBlok'] = $drawBlok;
                 $arrView['total_pokok'] = $count;
@@ -258,7 +260,7 @@ class TrackerController extends Controller
                     ->orderBy('id', 'desc') // Sort by 'id' column in descending order
                     ->get();
 
-                $plot_kuning = $plot_kuning->groupBy(['est']);
+                $plot_kuning = $plot_kuning->groupBy(['blok']);
                 $plot_kuning = json_decode($plot_kuning, true);
 
                 $count = array_reduce($plot_kuning, function ($carry, $items) {
@@ -303,7 +305,73 @@ class TrackerController extends Controller
                 $values = [];
 
 
+                $new_blok = array();
+                foreach ($drawBlok as $key => $value) {
+                    $lat_lon = array(); // Initialize lat_lon as an empty array
+                    $jumblok = 0; // Initialize jumblok to 0
 
+                    $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
+
+                    foreach ($value as $key2 => $value2) {
+                        $statusCount = 0;
+                        $verif = 0;
+                        foreach ($plot_kuning as $key3 => $value3) {
+                            if ($key === $key3) {
+                                foreach ($value3 as $key4 => $value4) {
+                                    // Calculate jum_blok for the current key
+                                    $jumblok = count($value3);
+
+                                    // Check if the 'status' is 'Belum'
+                                    if (isset($value4['status']) && $value4['status'] == 'Sudah') {
+                                        $statusCount++;
+                                    }
+                                    if (isset($value4['status']) && $value4['status'] == 'Terverifikasi') {
+                                        $verif++;
+                                    }
+
+                                    if ($statusCount >= 5 && $jumblok >= 1 && $jumblok <= 5) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount >= 5 && $jumblok >= 6 && $jumblok <= 30) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount == 10 &&  $jumblok == 10) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount >= 10 && $jumblok >= 11 && $jumblok <= 30) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount >= 20 && $jumblok >= 30) {
+                                        $kategori = 'Hijau';
+                                    }
+                                }
+
+                                if (isset($value2['lat']) && isset($value2['lon'])) {
+                                    $lat = $value2['lat'];
+                                    $lon = $value2['lon'];
+                                    $lat_lon[] = $lat . ';' . $lon;
+                                }
+                            }
+                        }
+                    }
+
+                    // If lat_lon is still empty, collect all 'lat_lon' values from $value
+                    if (empty($lat_lon)) {
+                        foreach ($value as $item) {
+                            if (isset($item['lat']) && isset($item['lon'])) {
+                                $lat = $item['lat'];
+                                $lon = $item['lon'];
+                                $lat_lon[] = $lat . ';' . $lon;
+                            }
+                        }
+                    }
+
+                    $new_blok[$key]['jum_pokok'] = $jumblok;
+                    $new_blok[$key]['afd_nama'] = $key;
+                    $new_blok[$key]['Diverif'] = $verif;
+                    $new_blok[$key]['kategori'] = $kategori;
+                    $new_blok[$key]['Ditangani'] = $statusCount;
+                    $new_blok[$key]['lat_lon'] = $lat_lon;
+                }
+
+
+                $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $values;
                 $arrView['drawBlok'] = $drawBlok;
                 $arrView['total_pokok'] = $count;
@@ -346,10 +414,10 @@ class TrackerController extends Controller
                     ->orderBy('id', 'desc') // Sort by 'id' column in descending order
                     ->get();
 
-                $plot_kuning = $plot_kuning->groupBy(['est']);
+                $plot_kuning = $plot_kuning->groupBy(['blok']);
                 $plot_kuning = json_decode($plot_kuning, true);
 
-                // dd($plot_kuning[7563]);
+                // dd($plot_kuning);
 
 
 
@@ -393,12 +461,80 @@ class TrackerController extends Controller
 
                 $values = reset($plot_kuning);
 
+                $new_blok = array();
+                foreach ($drawBlok as $key => $value) {
+                    $lat_lon = array(); // Initialize lat_lon as an empty array
+                    $jumblok = 0; // Initialize jumblok to 0
 
+                    $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
+
+                    foreach ($value as $key2 => $value2) {
+                        $statusCount = 0;
+                        $verif = 0;
+                        foreach ($plot_kuning as $key3 => $value3) {
+                            if ($key === $key3) {
+                                foreach ($value3 as $key4 => $value4) {
+                                    // Calculate jum_blok for the current key
+                                    $jumblok = count($value3);
+
+                                    // Check if the 'status' is 'Belum'
+                                    if (isset($value4['status']) && $value4['status'] == 'Sudah') {
+                                        $statusCount++;
+                                    }
+                                    if (isset($value4['status']) && $value4['status'] == 'Terverifikasi') {
+                                        $verif++;
+                                    }
+
+                                    if ($statusCount >= 5 && $jumblok >= 1 && $jumblok <= 5) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount >= 5 && $jumblok >= 6 && $jumblok <= 30) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount == 10 &&  $jumblok == 10) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount >= 10 && $jumblok >= 11 && $jumblok <= 30) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount >= 20 && $jumblok >= 30) {
+                                        $kategori = 'Hijau';
+                                    }
+                                }
+
+                                if (isset($value2['lat']) && isset($value2['lon'])) {
+                                    $lat = $value2['lat'];
+                                    $lon = $value2['lon'];
+                                    $lat_lon[] = $lat . ';' . $lon;
+                                }
+                            }
+                        }
+                    }
+
+                    // If lat_lon is still empty, collect all 'lat_lon' values from $value
+                    if (empty($lat_lon)) {
+                        foreach ($value as $item) {
+                            if (isset($item['lat']) && isset($item['lon'])) {
+                                $lat = $item['lat'];
+                                $lon = $item['lon'];
+                                $lat_lon[] = $lat . ';' . $lon;
+                            }
+                        }
+                    }
+
+                    $new_blok[$key]['jum_pokok'] = $jumblok;
+                    $new_blok[$key]['afd_nama'] = $key;
+                    $new_blok[$key]['Diverif'] = $verif;
+                    $new_blok[$key]['kategori'] = $kategori;
+                    $new_blok[$key]['Ditangani'] = $statusCount;
+                    $new_blok[$key]['lat_lon'] = $lat_lon;
+                }
+
+
+
+
+                // dd($new_blok, $drawBlok, $plot_kuning);
+
+
+                $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $values;
-
                 $arrView['drawBlok'] = $drawBlok;
-
-
                 $arrView['total_pokok'] = $count;
                 $arrView['total_ditangani'] = $count_sudah;
                 $arrView['persen_ditangani'] = $percentage_sudah;
@@ -442,7 +578,7 @@ class TrackerController extends Controller
                     ->get();
 
 
-                $plot_kuning = $plot_kuning->groupBy(['est']);
+                $plot_kuning = $plot_kuning->groupBy(['blok']);
                 $plot_kuning = json_decode($plot_kuning, true);
                 // dd($plot_kuning, $blok, $estate);
                 $count = array_reduce($plot_kuning, function ($carry, $items) {
@@ -480,10 +616,73 @@ class TrackerController extends Controller
                 $drawBlok = $drawBlok->groupBy(['nama']);
                 $drawBlok = json_decode($drawBlok, true);
                 $values = [];
+                $new_blok = array();
+                foreach ($drawBlok as $key => $value) {
+                    $lat_lon = array(); // Initialize lat_lon as an empty array
+                    $jumblok = 0; // Initialize jumblok to 0
 
+                    $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
 
+                    foreach ($value as $key2 => $value2) {
+                        $statusCount = 0;
+                        $verif = 0;
+                        foreach ($plot_kuning as $key3 => $value3) {
+                            if ($key === $key3) {
+                                foreach ($value3 as $key4 => $value4) {
+                                    // Calculate jum_blok for the current key
+                                    $jumblok = count($value3);
+
+                                    // Check if the 'status' is 'Belum'
+                                    if (isset($value4['status']) && $value4['status'] == 'Sudah') {
+                                        $statusCount++;
+                                    }
+                                    if (isset($value4['status']) && $value4['status'] == 'Terverifikasi') {
+                                        $verif++;
+                                    }
+
+                                    if ($statusCount >= 5 && $jumblok >= 1 && $jumblok <= 5) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount >= 5 && $jumblok >= 6 && $jumblok <= 30) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount == 10 &&  $jumblok == 10) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount >= 10 && $jumblok >= 11 && $jumblok <= 30) {
+                                        $kategori = 'Hijau';
+                                    } elseif ($statusCount >= 20 && $jumblok >= 30) {
+                                        $kategori = 'Hijau';
+                                    }
+                                }
+
+                                if (isset($value2['lat']) && isset($value2['lon'])) {
+                                    $lat = $value2['lat'];
+                                    $lon = $value2['lon'];
+                                    $lat_lon[] = $lat . ';' . $lon;
+                                }
+                            }
+                        }
+                    }
+
+                    // If lat_lon is still empty, collect all 'lat_lon' values from $value
+                    if (empty($lat_lon)) {
+                        foreach ($value as $item) {
+                            if (isset($item['lat']) && isset($item['lon'])) {
+                                $lat = $item['lat'];
+                                $lon = $item['lon'];
+                                $lat_lon[] = $lat . ';' . $lon;
+                            }
+                        }
+                    }
+
+                    $new_blok[$key]['jum_pokok'] = $jumblok;
+                    $new_blok[$key]['afd_nama'] = $key;
+                    $new_blok[$key]['Diverif'] = $verif;
+                    $new_blok[$key]['kategori'] = $kategori;
+                    $new_blok[$key]['Ditangani'] = $statusCount;
+                    $new_blok[$key]['lat_lon'] = $lat_lon;
+                }
+
+                $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $values;
-
                 $arrView['drawBlok'] = $drawBlok;
                 $arrView['total_pokok'] = $count;
                 $arrView['total_ditangani'] = $count_sudah;

@@ -433,47 +433,7 @@
         var markerBlok = L.markerClusterGroup().addTo(map);
 
         map.addLayer(areaMapsLayer);
-        map.removeLayer(markerBlok); // Hide Draw Blok initially
 
-        // Define a unique ID for the legend container
-        // var legendId = 'legend-container2';
-
-        // // Remove the previous legend if it exists
-        // var existingLegend = document.getElementById(legendId);
-        // if (existingLegend) {
-        //     existingLegend.remove();
-        // }
-
-        // // Define the legend control
-        // var legend = L.control({
-        //     position: 'bottomleft'
-        // });
-
-        // legend.onAdd = function(map) {
-        //     var div = L.DomUtil.create('div', 'info legend');
-        //     div.id = legendId; // Set the unique ID
-        //     div.innerHTML = '<strong>Legend</strong><br>';
-        //     div.innerHTML += '<label for="drawMapsCheckbox"><input type="radio" name="mapToggle" id="drawMapsCheckbox" checked> Draw Maps</label><br>';
-        //     div.innerHTML += '<label for="drawblokCheckbox"><input type="radio" name="mapToggle" id="drawblokCheckbox"> Draw Blok</label><br>';
-        //     return div;
-        // };
-
-        // legend.addTo(map);
-
-        // // Add event listeners to the radio buttons
-        // document.getElementById('drawMapsCheckbox').addEventListener('change', function() {
-        //     if (this.checked) {
-        //         map.addLayer(areaMapsLayer);
-        //         map.removeLayer(markerBlok);
-        //     }
-        // });
-
-        // document.getElementById('drawblokCheckbox').addEventListener('change', function() {
-        //     if (this.checked) {
-        //         map.addLayer(markerBlok);
-        //         // map.removeLayer(areaMapsLayer);
-        //     }
-        // });
 
 
 
@@ -508,7 +468,7 @@
                     // var polygon = L.polygon(coordinates).addTo(areaMapsLayer);
 
                     var polygon = L.polygon(coordinates, {
-                        fillOpacity: 0.2, // Set the fill opacity to a low value
+                        fillOpacity: 0.05, // Set the fill opacity to a low value
                         opacity: 0.5 // Set the border opacity to a low value
                     }).addTo(areaMapsLayer);
 
@@ -641,7 +601,7 @@
                             var komentar = obj.komentar;
                             var id = obj.id;
 
-                            console.log(foto);
+                            // console.log(foto);
                             if ((statusFilter === "all" || statusFilter === status) && (kondisiFilter === "all" || kondisiFilter === kondisi)) {
                                 var icon;
                                 if (status === 'Sudah') {
@@ -684,57 +644,89 @@
             updateMarkers(); // Initially display all markers
         }
 
-        function drawblok(drawBlok) {
+        function drawMap(newData) {
             markerBlok.clearLayers(); // Clear area maps layer only
 
             var bounds = new L.LatLngBounds(); // Create a bounds object to store the coordinates
 
-            for (var i = 0; i < drawBlok.length; i++) {
-                var regionData = drawBlok[i][1];
+            for (var key in newData) {
+                if (newData.hasOwnProperty(key)) {
+                    var regionData = newData[key];
 
-                // Check if regionData is an array
-                if (Array.isArray(regionData)) {
-                    // Initialize an array to store coordinates for the polyline
-                    var coordinates = [];
+                    for (var i = 0; i < regionData.length; i++) {
+                        var data = regionData[i].lat_lon;
 
-                    // Loop through the array of objects within regionData
-                    for (var j = 0; j < regionData.length; j++) {
-                        var obj = regionData[j];
-                        var lat = obj.lat;
-                        var lon = obj.lon;
-                        var afd_nama = obj.nama;
+                        if (Array.isArray(data)) {
+                            // Initialize the coordinates array for each polygon
+                            var coordinates = [];
 
-                        // Create a LatLng object for each coordinate
-                        var latLng = new L.LatLng(lat, lon);
+                            for (var j = 0; j < data.length; j++) {
+                                var latLon = data[j].split(';'); // Split the lat_lon string by ';'
+                                var lat = parseFloat(latLon[0]);
+                                var lon = parseFloat(latLon[1]);
 
-                        // Extend the bounds with the new LatLng object
-                        bounds.extend(latLng);
-                        coordinates.push(latLng);
+                                if (!isNaN(lat) && !isNaN(lon)) {
+                                    var latLng = new L.LatLng(lat, lon);
+
+                                    // Extend the bounds with the new LatLng object
+                                    bounds.extend(latLng);
+                                    coordinates.push(latLng);
+                                }
+                            }
+
+                            // Get other properties from your data
+                            var afd_nama = regionData[i].afd_nama;
+                            var jum_pokok = regionData[i].jum_pokok;
+                            var Ditangani = regionData[i].Ditangani;
+                            var Diverif = regionData[i].Diverif;
+                            var kategori = regionData[i].kategori;
+                            // Define a default style for the polygon
+                            var polygonStyle = {
+                                fillOpacity: 0.05,
+                                opacity: 0.5
+                            };
+
+                            // Conditionally set the background color and opacity based on the 'kategori' value
+                            if (kategori === 'Hijau') {
+                                polygonStyle.fillColor = 'green';
+                                polygonStyle.fillOpacity = 0.2; // Set the fill opacity for 'Hijau'
+                                polygonStyle.opacity = 0.5; // Set the border opacity for 'Hijau'
+                            } else {
+                                polygonStyle.fillColor = 'blue';
+                                polygonStyle.fillOpacity = 0.01; // Set the fill opacity for other categories
+                                polygonStyle.opacity = 0.5; // Set the border opacity for other categories
+                            }
+
+                            var polygon = L.polygon(coordinates, polygonStyle).addTo(markerBlok);
+
+                            var polygonCenter = polygon.getBounds().getCenter();
+
+                            var popupContent = `<div class="custom-popup"><strong>Dtracking Blok: </strong>${afd_nama}<br/>`;
+                            popupContent += `<strong>Jumlah Pokok: </strong>${jum_pokok}<br/>`;
+                            popupContent += `<strong>Di tangani: </strong>${Ditangani}<br/>`;
+                            popupContent += `<strong>DI Vertifikasi: </strong>${Diverif}<br/>`;
+                            popupContent += '</div>'; // Close the custom-popup div
+
+                            var label = L.marker(polygonCenter, {
+                                icon: L.divIcon({
+                                    className: 'label-blok',
+                                    html: afd_nama,
+                                    iconSize: [50, 10],
+                                })
+                            }).addTo(markerBlok);
+
+                            label.bindPopup(popupContent);
+                        }
                     }
-
-                    var polygon = L.polygon(coordinates, {
-                        fillColor: 'red', // Set the fill color to red
-                        color: 'red', // Set the border color to red
-                        fillOpacity: 0.01, // Set the fill opacity to a low value
-                        opacity: 0.01 // Set the border opacity to a low value
-                    }).addTo(markerBlok);
-                    // Calculate the center of the polygon
-                    var polygonCenter = polygon.getBounds().getCenter();
-
-                    // Create a label marker at the center with afd_nama text
-                    var label = L.marker(polygonCenter, {
-                        icon: L.divIcon({
-                            className: 'label-blok',
-                            html: afd_nama,
-                            iconSize: [50, 10],
-                        })
-                    }).addTo(markerBlok);
                 }
             }
 
             // Fit the map to the calculated bounds
             map.fitBounds(bounds);
         }
+
+
+
 
         // end maps 
 
@@ -840,6 +832,7 @@
                     const RegResult = Object.entries(plot['blok']);
                     const pokok = Object.entries(plot['pokok']);
                     const drawBlok = Object.entries(plot['drawBlok']);
+                    const new_blok = Object.entries(plot['new_blok']);
                     // console.log(result);
                     var totalx = plot['total_pokok'];
                     var total_ditangani = plot['total_ditangani'];
@@ -868,10 +861,22 @@
                         console.error("Element with id 'total_pk' not found.");
                     }
 
+                    // console.log(requestData);
 
-                    drawMaps(RegResult);
+                    let type = requestData['dataType'];
+
+                    // console.log(type);
+
+                    if (type == 'regional') {
+                        drawMaps(RegResult);
+                    } else {
+                        drawMap(new_blok);
+                    }
+
+
                     drawPokok(pokok);
-                    drawblok(drawBlok);
+
+
 
 
                     var listQC = $('#user_qc').DataTable({
