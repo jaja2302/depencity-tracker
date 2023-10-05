@@ -309,14 +309,48 @@ class TrackerController extends Controller
                 foreach ($drawBlok as $key => $value) {
                     $lat_lon = array(); // Initialize lat_lon as an empty array
                     $jumblok = 0; // Initialize jumblok to 0
-
                     $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
 
                     foreach ($value as $key2 => $value2) {
                         $statusCount = 0;
                         $verif = 0;
+                        if ($regional == 2) {
+                            $modifiedKey =  preg_replace('/0/', '', $key, 1);
+                        } else if ($regional == 1 && $estate == 'PLE') {
+                            $modifiedKey =  preg_replace('/0/', '', $key, 1);
+                        } else {
+                            if (strpos($key, 'CBI') !== false && strlen($key) == 9) {
+                                $sliced = substr($key, 0, -6);
+                                $modifiedKey = substr_replace($sliced, '0', 1, 0);
+                            } else if (strpos($key, 'CBI') !== false) {
+                                $modifiedKey = substr($key, 0, -4);
+                            } else if (strpos($key, 'CB') !== false) {
+                                $replace = substr_replace($key, '', 1, 1);
+                                $sliced = substr($replace, 0, -3);
+                                $modifiedKey = substr_replace($sliced, '0', 1, 0);
+                            } else {
+                                $modifiedKey = $key;
+                            }
+                        }
+
                         foreach ($plot_kuning as $key3 => $value3) {
-                            if ($key === $key3) {
+
+                            // $test = 'N38-CBI';
+                            if (strpos($key3, 'CBI') !== false) {
+                                $parts = explode('-CBI', $key3);
+                                $newKey = $parts[0];
+                                // dd($newKey);
+                            } else if (strpos($key3, 'CB') !== false) {
+                                $replace = substr_replace($key3, '', 1, 1);
+                                $sliced = substr($replace, 0, -3);
+                                $newKey = substr_replace($sliced, '0', 1, 0);
+                            } else {
+                                $newKey = $key3;
+                            }
+
+                            // dd($newKey);
+                            if ($modifiedKey === $newKey) {
+                                // dd($newKey);
                                 foreach ($value3 as $key4 => $value4) {
                                     // Calculate jum_blok for the current key
                                     $jumblok = count($value3);
@@ -348,6 +382,7 @@ class TrackerController extends Controller
                                     $lat_lon[] = $lat . ';' . $lon;
                                 }
                             }
+                            // dd($key, $modifiedKey, $key3);
                         }
                     }
 
@@ -418,8 +453,22 @@ class TrackerController extends Controller
                 $plot_kuning = json_decode($plot_kuning, true);
 
                 // dd($plot_kuning);
+                $datatables = DB::connection('mysql2')
+                    ->table('deficiency_tracker')
+                    ->select('deficiency_tracker.*')
+                    ->join('afdeling', 'afdeling.nama', '=', 'deficiency_tracker.afd')
+                    ->where('deficiency_tracker.est', '=', $estate)
+                    ->where('afdeling.id', '=', $afdeling)
+                    // ->whereNotIn('id', [353])
+                    ->orderBy('id', 'desc') // Sort by 'id' column in descending order
+                    ->get();
 
 
+                $datatables = json_decode($datatables, true);
+
+
+
+                // dd($datatables);
 
 
                 $count = array_reduce($plot_kuning, function ($carry, $items) {
@@ -459,20 +508,54 @@ class TrackerController extends Controller
                 $drawBlok = json_decode($drawBlok, true);
 
 
-                $values = reset($plot_kuning);
 
                 $new_blok = array();
+
                 foreach ($drawBlok as $key => $value) {
                     $lat_lon = array(); // Initialize lat_lon as an empty array
                     $jumblok = 0; // Initialize jumblok to 0
-
                     $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
 
                     foreach ($value as $key2 => $value2) {
                         $statusCount = 0;
                         $verif = 0;
+                        if ($regional == 2) {
+                            $modifiedKey =  preg_replace('/0/', '', $key, 1);
+                        } else if ($regional == 1 && $estate == 'PLE') {
+                            $modifiedKey =  preg_replace('/0/', '', $key, 1);
+                        } else {
+                            if (strpos($key, 'CBI') !== false && strlen($key) == 9) {
+                                $sliced = substr($key, 0, -6);
+                                $modifiedKey = substr_replace($sliced, '0', 1, 0);
+                            } else if (strpos($key, 'CBI') !== false) {
+                                $modifiedKey = substr($key, 0, -4);
+                            } else if (strpos($key, 'CB') !== false) {
+                                $replace = substr_replace($key, '', 1, 1);
+                                $sliced = substr($replace, 0, -3);
+                                $modifiedKey = substr_replace($sliced, '0', 1, 0);
+                            } else {
+                                $modifiedKey = $key;
+                            }
+                        }
+
                         foreach ($plot_kuning as $key3 => $value3) {
-                            if ($key === $key3) {
+
+                            // $test = 'N38-CBI';
+                            if (strpos($key3, 'CBI') !== false) {
+                                $parts = explode('-CBI', $key3);
+                                $newKey = $parts[0];
+                                // dd($newKey);
+                            } else if (strpos($key3, 'CB') !== false) {
+                                $replace = substr_replace($key3, '', 1, 1);
+                                $sliced = substr($replace, 0, -3);
+                                $newKey = substr_replace($sliced, '0', 1, 0);
+                            } else {
+                                $newKey = $key3;
+                            }
+
+                            // dd($newKey);
+                            if ($modifiedKey === $newKey) {
+                                // dd($newKey);
                                 foreach ($value3 as $key4 => $value4) {
                                     // Calculate jum_blok for the current key
                                     $jumblok = count($value3);
@@ -504,6 +587,7 @@ class TrackerController extends Controller
                                     $lat_lon[] = $lat . ';' . $lon;
                                 }
                             }
+                            // dd($key, $modifiedKey, $key3);
                         }
                     }
 
@@ -527,13 +611,13 @@ class TrackerController extends Controller
                 }
 
 
-
+                // dd($new_blok);
 
                 // dd($new_blok, $drawBlok, $plot_kuning);
 
 
                 $arrView['new_blok'] = $new_blok;
-                $arrView['datatables'] = $values;
+                $arrView['datatables'] = $datatables;
                 $arrView['drawBlok'] = $drawBlok;
                 $arrView['total_pokok'] = $count;
                 $arrView['total_ditangani'] = $count_sudah;
@@ -616,18 +700,55 @@ class TrackerController extends Controller
                 $drawBlok = $drawBlok->groupBy(['nama']);
                 $drawBlok = json_decode($drawBlok, true);
                 $values = [];
+
+
+
                 $new_blok = array();
                 foreach ($drawBlok as $key => $value) {
                     $lat_lon = array(); // Initialize lat_lon as an empty array
                     $jumblok = 0; // Initialize jumblok to 0
-
                     $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
 
                     foreach ($value as $key2 => $value2) {
                         $statusCount = 0;
                         $verif = 0;
+                        if ($regional == 2) {
+                            $modifiedKey =  preg_replace('/0/', '', $key, 1);
+                        } else if ($regional == 1 && $estate == 'PLE') {
+                            $modifiedKey =  preg_replace('/0/', '', $key, 1);
+                        } else {
+                            if (strpos($key, 'CBI') !== false && strlen($key) == 9) {
+                                $sliced = substr($key, 0, -6);
+                                $modifiedKey = substr_replace($sliced, '0', 1, 0);
+                            } else if (strpos($key, 'CBI') !== false) {
+                                $modifiedKey = substr($key, 0, -4);
+                            } else if (strpos($key, 'CB') !== false) {
+                                $replace = substr_replace($key, '', 1, 1);
+                                $sliced = substr($replace, 0, -3);
+                                $modifiedKey = substr_replace($sliced, '0', 1, 0);
+                            } else {
+                                $modifiedKey = $key;
+                            }
+                        }
+
                         foreach ($plot_kuning as $key3 => $value3) {
-                            if ($key === $key3) {
+
+                            // $test = 'N38-CBI';
+                            if (strpos($key3, 'CBI') !== false) {
+                                $parts = explode('-CBI', $key3);
+                                $newKey = $parts[0];
+                                // dd($newKey);
+                            } else if (strpos($key3, 'CB') !== false) {
+                                $replace = substr_replace($key3, '', 1, 1);
+                                $sliced = substr($replace, 0, -3);
+                                $newKey = substr_replace($sliced, '0', 1, 0);
+                            } else {
+                                $newKey = $key3;
+                            }
+
+                            // dd($newKey);
+                            if ($modifiedKey === $newKey) {
+                                // dd($newKey);
                                 foreach ($value3 as $key4 => $value4) {
                                     // Calculate jum_blok for the current key
                                     $jumblok = count($value3);
@@ -659,6 +780,7 @@ class TrackerController extends Controller
                                     $lat_lon[] = $lat . ';' . $lon;
                                 }
                             }
+                            // dd($key, $modifiedKey, $key3);
                         }
                     }
 
@@ -680,6 +802,8 @@ class TrackerController extends Controller
                     $new_blok[$key]['Ditangani'] = $statusCount;
                     $new_blok[$key]['lat_lon'] = $lat_lon;
                 }
+
+
 
                 $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $values;
