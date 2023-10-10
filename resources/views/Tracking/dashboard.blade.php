@@ -437,56 +437,56 @@
 
 
 
-        function drawMaps(regions) {
-            areaMapsLayer.clearLayers(); // Clear area maps layer only
+        // function drawMaps(regions) {
+        //     areaMapsLayer.clearLayers(); // Clear area maps layer only
 
-            var bounds = new L.LatLngBounds(); // Create a bounds object to store the coordinates
+        //     var bounds = new L.LatLngBounds(); // Create a bounds object to store the coordinates
 
-            for (var i = 0; i < regions.length; i++) {
-                var regionData = regions[i][1];
+        //     for (var i = 0; i < regions.length; i++) {
+        //         var regionData = regions[i][1];
 
-                // Check if regionData is an array
-                if (Array.isArray(regionData)) {
-                    // Initialize an array to store coordinates for the polyline
-                    var coordinates = [];
+        //         // Check if regionData is an array
+        //         if (Array.isArray(regionData)) {
+        //             // Initialize an array to store coordinates for the polyline
+        //             var coordinates = [];
 
-                    // Loop through the array of objects within regionData
-                    for (var j = 0; j < regionData.length; j++) {
-                        var obj = regionData[j];
-                        var lat = obj.lat;
-                        var lon = obj.lon;
-                        var afd_nama = obj.nama;
+        //             // Loop through the array of objects within regionData
+        //             for (var j = 0; j < regionData.length; j++) {
+        //                 var obj = regionData[j];
+        //                 var lat = obj.lat;
+        //                 var lon = obj.lon;
+        //                 var afd_nama = obj.nama;
 
-                        // Create a LatLng object for each coordinate
-                        var latLng = new L.LatLng(lat, lon);
+        //                 // Create a LatLng object for each coordinate
+        //                 var latLng = new L.LatLng(lat, lon);
 
-                        // Extend the bounds with the new LatLng object
-                        bounds.extend(latLng);
-                        coordinates.push(latLng);
-                    }
+        //                 // Extend the bounds with the new LatLng object
+        //                 bounds.extend(latLng);
+        //                 coordinates.push(latLng);
+        //             }
 
-                    // var polygon = L.polygon(coordinates).addTo(areaMapsLayer);
+        //             // var polygon = L.polygon(coordinates).addTo(areaMapsLayer);
 
-                    var polygon = L.polygon(coordinates, {
-                        fillOpacity: 0.05, // Set the fill opacity to a low value
-                        opacity: 0.5 // Set the border opacity to a low value
-                    }).addTo(areaMapsLayer);
+        //             var polygon = L.polygon(coordinates, {
+        //                 fillOpacity: 0.05, // Set the fill opacity to a low value
+        //                 opacity: 0.5 // Set the border opacity to a low value
+        //             }).addTo(areaMapsLayer);
 
-                    var polygonCenter = polygon.getBounds().getCenter();
+        //             var polygonCenter = polygon.getBounds().getCenter();
 
-                    var label = L.marker(polygonCenter, {
-                        icon: L.divIcon({
-                            className: 'label-blok',
-                            html: afd_nama,
-                            iconSize: [50, 10],
-                        })
-                    }).addTo(areaMapsLayer);
-                }
-            }
+        //             var label = L.marker(polygonCenter, {
+        //                 icon: L.divIcon({
+        //                     className: 'label-blok',
+        //                     html: afd_nama,
+        //                     iconSize: [50, 10],
+        //                 })
+        //             }).addTo(areaMapsLayer);
+        //         }
+        //     }
 
-            // Fit the map to the calculated bounds
-            map.fitBounds(bounds);
-        }
+        //     // Fit the map to the calculated bounds
+        //     map.fitBounds(bounds);
+        // }
 
         function drawPokok(pokok) {
             markersLayer.clearLayers(); // Clear markers layer only
@@ -605,6 +605,7 @@
                             var foto = obj.foto;
                             var komentar = obj.komentar;
                             var id = obj.id;
+                            var pupuk = obj.pupuk;
 
                             if ((statusFilter === "all" || statusFilter === status) && (kondisiFilter === "all" || kondisiFilter === kondisi)) {
                                 var icon;
@@ -633,7 +634,15 @@
                                     var fotoArray = foto.split('$');
                                     var komentararray = komentar.split('$');
                                     for (var k = 0; k < fotoArray.length; k++) {
-                                        popupContent += `<img class="popup-image" src="https://mobilepro.srs-ssms.com/storage/app/public/deficiency_tracker/${fotoArray[k]}" alt="Foto Temuan" onclick="openModal(this.src, '${komentararray}')"><br/>`;
+                                        popupContent += `<img class="popup-image" src="https://mobilepro.srs-ssms.com/storage/app/public/deficiency_tracker/${fotoArray[k]}" alt="Foto Temuan" onclick="openModal(this.src, '${komentar}')"><br/>`;
+                                    }
+                                }
+                                if (pupuk) {
+                                    var komentpupuk = pupuk.split('$');
+
+                                    for (var k = 0; k < komentpupuk.length; k++) {
+                                        popupContent += `<strong>Pupuk: </strong>${komentpupuk[k]}<br/>`;
+
                                     }
                                 }
                                 popupContent += '</div>'; // Close the custom-popup div
@@ -688,6 +697,8 @@
                             var Ditangani = regionData[i].Ditangani;
                             var Diverif = regionData[i].Diverif;
                             var kategori = regionData[i].kategori;
+                            var pokok_namablok = regionData[i].pokok_namablok;
+                            var Ket = regionData[i].Ket;
                             // Define a default style for the polygon
                             var polygonStyle = {
                                 fillOpacity: 0.05,
@@ -713,6 +724,9 @@
                             popupContent += `<strong>Jumlah Pokok: </strong>${jum_pokok}<br/>`;
                             popupContent += `<strong>Di tangani: </strong>${Ditangani}<br/>`;
                             popupContent += `<strong>DI Vertifikasi: </strong>${Diverif}<br/>`;
+                            popupContent += `<strong>Kategori: </strong>${kategori}<br/>`;
+                            popupContent += `<strong>Keterangan: </strong>${Ket}<br/>`;
+                            // popupContent += `<strong>Nama blok pokok: </strong>${pokok_namablok}<br/>`
                             popupContent += '</div>'; // Close the custom-popup div
 
                             var label = L.marker(polygonCenter, {
@@ -778,13 +792,7 @@
             // Call the function to show additional options
             showAdditionalOptions(selectedOption);
 
-            // If "Blok" is selected, populate the Blok options initially
-            // if (selectedOption === 'Blok') {
-            //     var selectedAfdId = $('#afd').val();
 
-            //     // console.log(selectedAfdId);
-            //     populateBlokOptions(selectedAfdId);
-            // }
         });
 
 
@@ -815,7 +823,12 @@
             }
 
             // Add the dataType to the requestData object
+            if ($.fn.DataTable.isDataTable('#user_qc')) {
+                $('#user_qc').DataTable().destroy();
+            }
             requestData['dataType'] = dataType;
+
+
             Swal.fire({
                 title: 'Loading',
                 html: '<span class="loading-text">Mohon Tunggu...</span>',
@@ -826,9 +839,7 @@
                 }
 
             });
-            if ($.fn.DataTable.isDataTable('#user_qc')) {
-                $('#user_qc').DataTable().destroy();
-            }
+
             // Perform the AJAX request with the requestData
             $.ajax({
                 url: "{{ route('drawMaps') }}",
@@ -837,7 +848,7 @@
                 success: function(result) {
                     Swal.close();
                     var plot = JSON.parse(result);
-                    const RegResult = Object.entries(plot['blok']);
+
                     const pokok = Object.entries(plot['pokok']);
                     const drawBlok = Object.entries(plot['drawBlok']);
                     const new_blok = Object.entries(plot['new_blok']);
@@ -875,12 +886,12 @@
 
                     // console.log(type);
 
-                    if (type == 'regional') {
-                        drawMaps(RegResult);
-                    } else {
-                        drawMap(new_blok);
-                    }
-
+                    // if (type == 'regional') {
+                    //     drawMaps(RegResult);
+                    // } else {
+                    //     drawMap(new_blok);
+                    // }
+                    drawMap(new_blok);
 
                     drawPokok(pokok);
 

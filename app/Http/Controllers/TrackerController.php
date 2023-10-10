@@ -154,19 +154,6 @@ class TrackerController extends Controller
         switch ($dataType) {
             case 'regional':
 
-                // untuk draw map 
-                $plotEst = DB::connection('mysql2')
-                    ->table('estate_plot')
-                    ->select('estate_plot.*', 'wil.regional', 'wil.nama as nama')
-                    ->join('estate', 'estate.est', '=', 'estate_plot.est')
-                    ->join('wil', 'wil.id', '=', 'estate.wil')
-                    ->where('wil.regional', '=', $regional)
-                    // ->whereNotIn('id', [353])
-                    ->orderBy('id', 'desc') // Sort by 'id' column in descending order
-                    ->get();
-
-                $plotEst = $plotEst->groupBy(['est']);
-                $plotEst = json_decode($plotEst, true);
 
 
 
@@ -203,24 +190,203 @@ class TrackerController extends Controller
                     $percentage_sudah = 0; // Set a default value (0 or any other suitable value) when the denominator is zero.
                 }
 
-                $drawBlok = DB::connection('mysql2')
-                    ->table('blok')
-                    ->select('blok.*', 'estate.est', 'afdeling.nama as afd_nama')
-                    ->join('afdeling', 'afdeling.id', '=', 'blok.afdeling')
-                    ->join('estate', 'estate.id', '=', 'afdeling.estate')
-                    ->where('estate.est', '=', $estate)
-                    // ->where('blok.nama', '=', $blok)
 
-                    ->orderBy('id', 'desc')
+                $drawBlok = DB::connection('mysql2')
+                    ->table('estate_plot')
+                    ->select('estate_plot.*', 'wil.regional', 'wil.nama as nama')
+                    ->join('estate', 'estate.est', '=', 'estate_plot.est')
+                    ->join('wil', 'wil.id', '=', 'estate.wil')
+                    ->where('wil.regional', '=', $regional)
+                    // ->whereNotIn('id', [353])
+                    ->orderBy('id', 'desc') // Sort by 'id' column in descending order
                     ->get();
 
                 $drawBlok = $drawBlok->groupBy(['est']);
                 $drawBlok = json_decode($drawBlok, true);
 
-                // dd($plotBlok);
+                // dd($drawBlok);
                 $values = [];
 
-                $new_blok = [];
+                $outputArray = [];
+
+                foreach ($plot_kuning as $key => $value) {
+                    if ($regional == 2 && $estate == 'NKE') {
+                        $newKey = preg_replace('/^P-/', '', $key);
+
+                        // Merge the arrays if the key already exists in the output array
+                        if (isset($outputArray[$newKey])) {
+                            $outputArray[$newKey] = array_merge($outputArray[$newKey], $value);
+                        } else {
+                            $outputArray[$newKey] = $value;
+                        }
+                    } else {
+                        // If conditions are not met, keep the original key and value
+                        $outputArray[$key] = $value;
+                    }
+                }
+
+                // dd($outputArray);
+
+                $new_blok = array();
+
+                foreach ($drawBlok as $key => $value) {
+                    $lat_lon = array(); // Initialize lat_lon as an empty array
+                    $jumblok = 0; // Initialize jumblok to 0
+                    $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
+                    $ket = '-'; // Initialize kategori as 'Blue' by default
+
+                    foreach ($value as $key2 => $value2) {
+                        $statusCount = 0;
+                        $verif = 0;
+                        $modifiedKey = '-';
+                        if ($regional == 2 && $estate !== 'NKE') {
+                            $modifiedKey =  preg_replace('/0/', '', $key, 1);
+                        } else if ($regional == 1 && $estate == 'PLE') {
+                            $modifiedKey =  preg_replace('/0/', '', $key, 1);
+                        } else {
+                            if (strpos($key, 'CBI') !== false && strlen($key) == 9) {
+                                $sliced = substr($key, 0, -6);
+                                $modifiedKey = substr_replace($sliced, '0', 1, 0);
+                            } else if (strpos($key, 'CBI') !== false) {
+                                $modifiedKey = substr($key, 0, -4);
+                            } else if (strpos($key, 'CB') !== false) {
+                                $replace = substr_replace($key, '', 1, 1);
+                                $sliced = substr($replace, 0, -3);
+                                $modifiedKey = substr_replace($sliced, '0', 1, 0);
+                            } else {
+                                $modifiedKey = $key;
+                            }
+                        }
+
+                        foreach ($outputArray as $key3 => $value3) {
+
+                            // $test = 'N38-CBI';
+                            $newKey = '-';
+                            if (strpos($key3, 'CBI') !== false) {
+                                $parts = explode('-CBI', $key3);
+                                $newKey = $parts[0];
+                                // dd($newKey);
+                            } else if (strpos($key3, 'CB') !== false) {
+                                $replace = substr_replace($key3, '', 1, 1);
+                                $sliced = substr($replace, 0, -3);
+                                $newKey = substr_replace($sliced, '0', 1, 0);
+                            } else {
+                                $newKey = $key3;
+                            }
+
+                            // dd($newKey);
+                            if ($modifiedKey === $newKey) {
+                                $foundNewKey = $newKey;
+                                foreach ($value3 as $key4 => $value4) {
+                                    // Calculate jum_blok for the current key
+                                    $jumblok = count($value3);
+                                    // dd($value4);
+                                    // Check if the 'status' is 'Belum'
+                                    if (isset($value4['status']) && $value4['status'] == 'Sudah') {
+                                        $statusCount++;
+                                    }
+                                    if (isset($value4['status']) && $value4['status'] == 'Terverifikasi') {
+                                        $verif++;
+                                    }
+
+
+                                    if ($jumblok >= 1000 && $jumblok < 1000) {
+                                        if ($statusCount >= 500) {
+                                            $kategori = 'Hijau';
+                                            $ket = '1000 : 500';
+                                        }
+                                    } elseif ($jumblok >= 30 && $jumblok < 100) {
+                                        if ($statusCount >= 20) {
+                                            $kategori = 'Hijau';
+                                            $ket = '100 : 20';
+                                        }
+                                    } elseif ($jumblok >= 10 && $jumblok <= 30) {
+                                        if ($statusCount >= 10) {
+                                            $kategori = 'Hijau';
+                                            $ket = '11 : 10';
+                                        }
+                                    } elseif ($jumblok  >= 6 && $jumblok < 10) {
+                                        if ($statusCount = 5) {
+                                            $kategori = 'Hijau';
+                                            $ket = '10 : 10';
+                                        }
+                                    } elseif ($jumblok  == 1 && $jumblok < 6) {
+                                        if ($statusCount >= 5) {
+                                            $kategori = 'Hijau';
+                                            $ket = '6 : 5';
+                                        }
+                                    }
+                                }
+
+                                if (isset($value2['lat']) && isset($value2['lon'])) {
+                                    $lat = $value2['lat'];
+                                    $lon = $value2['lon'];
+                                    $lat_lon[] = $lat . ';' . $lon;
+                                }
+
+                                $new_blok[$key]['pokok_namablok'] = $value4['blok'];
+                            }
+                        }
+                    }
+
+                    // If lat_lon is still empty, collect all 'lat_lon' values from $value
+                    if (empty($lat_lon)) {
+                        foreach ($value as $item) {
+                            if (isset($item['lat']) && isset($item['lon'])) {
+                                $lat = $item['lat'];
+                                $lon = $item['lon'];
+                                $lat_lon[] = $lat . ';' . $lon;
+                            }
+                        }
+                    }
+
+                    $new_blok[$key]['jum_pokok'] = $jumblok;
+                    $new_blok[$key]['afd_nama'] = $key;
+                    $new_blok[$key]['Diverif'] = $verif;
+                    $new_blok[$key]['kategori'] = $kategori;
+                    $new_blok[$key]['Ket'] = $ket;
+                    $new_blok[$key]['Ditangani'] = $statusCount;
+                    $new_blok[$key]['lat_lon'] = $lat_lon;
+                }
+
+                // dd($new_blok);
+
+
+                $new_pk = array();
+                foreach ($plot_kuning as $key => $value) {
+                    foreach ($value as $key1 => $value1) {
+
+                        if ($value1['jenis_pupuk_id'] != null) {
+                            $pupukx = explode('$', $value1['jenis_pupuk_id']);
+                            // dd($pupukx);
+                            $pupuk = DB::connection('mysql2')
+                                ->table('pupuk')
+                                ->select('pupuk.*')
+                                ->whereIn('pupuk.id', $pupukx) // Pass the array directly to whereIn
+                                ->orderBy('id', 'desc')
+                                ->pluck('nama');
+
+                            $pupuk = json_decode(json_encode($pupuk), true); // Convert the result to an array
+                            $new_ppk = implode("$", $pupuk);
+                        } else {
+                            $new_ppk = null;
+                        }
+
+
+
+
+                        // dd($new_ppk);
+                        $new_pk[$key][$key1]['pupuk'] = $new_ppk;
+                        $new_pk[$key][$key1]['lat'] = $value1['lat'];
+                        $new_pk[$key][$key1]['lon'] = $value1['lon'];
+                        $new_pk[$key][$key1]['blok'] = $value1['blok'];
+                        $new_pk[$key][$key1]['kondisi'] = $value1['kondisi'];
+                        $new_pk[$key][$key1]['status'] = $value1['status'];
+                        $new_pk[$key][$key1]['foto'] = $value1['foto'];
+                        $new_pk[$key][$key1]['komentar'] = $value1['komentar'];
+                        $new_pk[$key][$key1]['id'] = $value1['id'];
+                    }
+                }
 
                 $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $values;
@@ -228,28 +394,14 @@ class TrackerController extends Controller
                 $arrView['total_pokok'] = $count;
                 $arrView['total_ditangani'] = $count_sudah;
                 $arrView['persen_ditangani'] = $percentage_sudah;
-                $arrView['blok'] = $plotEst;
-                $arrView['pokok'] = $plot_kuning;
+                // $arrView['blok'] = $plotEst;
+                $arrView['pokok'] = $new_pk;
 
                 // dd($plotEst);
                 break;
 
             case 'estate':
 
-                $plotEst = DB::connection('mysql2')
-                    ->table('estate_plot')
-                    ->select('estate_plot.*', 'estate.nama as nama')
-                    ->join('estate', 'estate.est', '=', 'estate_plot.est')
-                    ->where('estate_plot.est', '=', $estate)
-                    // ->whereNotIn('id', [353])
-                    ->orderBy('id', 'desc') // Sort by 'id' column in descending order
-                    ->get();
-
-                $plotEst = $plotEst->groupBy(['est']);
-                $plotEst = json_decode($plotEst, true);
-
-
-                // dd($plotEst);
 
 
                 $plot_kuning = DB::connection('mysql2')
@@ -306,15 +458,35 @@ class TrackerController extends Controller
 
 
                 $new_blok = array();
+
+                $outputArray = [];
+
+                foreach ($plot_kuning as $key => $value) {
+                    if ($regional == 2 && $estate == 'NKE') {
+                        $newKey = preg_replace('/^P-/', '', $key);
+
+                        // Merge the arrays if the key already exists in the output array
+                        if (isset($outputArray[$newKey])) {
+                            $outputArray[$newKey] = array_merge($outputArray[$newKey], $value);
+                        } else {
+                            $outputArray[$newKey] = $value;
+                        }
+                    } else {
+                        // If conditions are not met, keep the original key and value
+                        $outputArray[$key] = $value;
+                    }
+                }
                 foreach ($drawBlok as $key => $value) {
                     $lat_lon = array(); // Initialize lat_lon as an empty array
                     $jumblok = 0; // Initialize jumblok to 0
                     $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
+                    $ket = '-'; // Initialize kategori as 'Blue' by default
 
                     foreach ($value as $key2 => $value2) {
                         $statusCount = 0;
                         $verif = 0;
-                        if ($regional == 2) {
+                        $modifiedKey = '-';
+                        if ($regional == 2 && $estate !== 'NKE') {
                             $modifiedKey =  preg_replace('/0/', '', $key, 1);
                         } else if ($regional == 1 && $estate == 'PLE') {
                             $modifiedKey =  preg_replace('/0/', '', $key, 1);
@@ -333,9 +505,10 @@ class TrackerController extends Controller
                             }
                         }
 
-                        foreach ($plot_kuning as $key3 => $value3) {
+                        foreach ($outputArray as $key3 => $value3) {
 
                             // $test = 'N38-CBI';
+                            $newKey = '-';
                             if (strpos($key3, 'CBI') !== false) {
                                 $parts = explode('-CBI', $key3);
                                 $newKey = $parts[0];
@@ -350,11 +523,11 @@ class TrackerController extends Controller
 
                             // dd($newKey);
                             if ($modifiedKey === $newKey) {
-                                // dd($newKey);
+                                $foundNewKey = $newKey;
                                 foreach ($value3 as $key4 => $value4) {
                                     // Calculate jum_blok for the current key
                                     $jumblok = count($value3);
-
+                                    // dd($value4);
                                     // Check if the 'status' is 'Belum'
                                     if (isset($value4['status']) && $value4['status'] == 'Sudah') {
                                         $statusCount++;
@@ -363,16 +536,32 @@ class TrackerController extends Controller
                                         $verif++;
                                     }
 
-                                    if ($statusCount >= 5 && $jumblok >= 1 && $jumblok <= 5) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount >= 5 && $jumblok >= 6 && $jumblok <= 30) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount == 10 &&  $jumblok == 10) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount >= 10 && $jumblok >= 11 && $jumblok <= 30) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount >= 20 && $jumblok >= 30) {
-                                        $kategori = 'Hijau';
+
+                                    if ($jumblok >= 1000 && $jumblok < 1000) {
+                                        if ($statusCount >= 500) {
+                                            $kategori = 'Hijau';
+                                            $ket = '1000 : 500';
+                                        }
+                                    } elseif ($jumblok >= 30 && $jumblok < 100) {
+                                        if ($statusCount >= 20) {
+                                            $kategori = 'Hijau';
+                                            $ket = '100 : 20';
+                                        }
+                                    } elseif ($jumblok >= 10 && $jumblok <= 30) {
+                                        if ($statusCount >= 10) {
+                                            $kategori = 'Hijau';
+                                            $ket = '11 : 10';
+                                        }
+                                    } elseif ($jumblok  >= 6 && $jumblok < 10) {
+                                        if ($statusCount = 5) {
+                                            $kategori = 'Hijau';
+                                            $ket = '10 : 10';
+                                        }
+                                    } elseif ($jumblok  == 1 && $jumblok < 6) {
+                                        if ($statusCount >= 5) {
+                                            $kategori = 'Hijau';
+                                            $ket = '6 : 5';
+                                        }
                                     }
                                 }
 
@@ -381,8 +570,9 @@ class TrackerController extends Controller
                                     $lon = $value2['lon'];
                                     $lat_lon[] = $lat . ';' . $lon;
                                 }
+
+                                $new_blok[$key]['pokok_namablok'] = $value4['blok'];
                             }
-                            // dd($key, $modifiedKey, $key3);
                         }
                     }
 
@@ -401,10 +591,47 @@ class TrackerController extends Controller
                     $new_blok[$key]['afd_nama'] = $key;
                     $new_blok[$key]['Diverif'] = $verif;
                     $new_blok[$key]['kategori'] = $kategori;
+                    $new_blok[$key]['Ket'] = $ket;
                     $new_blok[$key]['Ditangani'] = $statusCount;
                     $new_blok[$key]['lat_lon'] = $lat_lon;
                 }
 
+
+                $new_pk = array();
+                foreach ($plot_kuning as $key => $value) {
+                    foreach ($value as $key1 => $value1) {
+
+                        if ($value1['jenis_pupuk_id'] != null) {
+                            $pupukx = explode('$', $value1['jenis_pupuk_id']);
+                            // dd($pupukx);
+                            $pupuk = DB::connection('mysql2')
+                                ->table('pupuk')
+                                ->select('pupuk.*')
+                                ->whereIn('pupuk.id', $pupukx) // Pass the array directly to whereIn
+                                ->orderBy('id', 'desc')
+                                ->pluck('nama');
+
+                            $pupuk = json_decode(json_encode($pupuk), true); // Convert the result to an array
+                            $new_ppk = implode("$", $pupuk);
+                        } else {
+                            $new_ppk = null;
+                        }
+
+
+
+
+                        // dd($new_ppk);
+                        $new_pk[$key][$key1]['pupuk'] = $new_ppk;
+                        $new_pk[$key][$key1]['lat'] = $value1['lat'];
+                        $new_pk[$key][$key1]['lon'] = $value1['lon'];
+                        $new_pk[$key][$key1]['blok'] = $value1['blok'];
+                        $new_pk[$key][$key1]['kondisi'] = $value1['kondisi'];
+                        $new_pk[$key][$key1]['status'] = $value1['status'];
+                        $new_pk[$key][$key1]['foto'] = $value1['foto'];
+                        $new_pk[$key][$key1]['komentar'] = $value1['komentar'];
+                        $new_pk[$key][$key1]['id'] = $value1['id'];
+                    }
+                }
 
                 $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $values;
@@ -412,9 +639,7 @@ class TrackerController extends Controller
                 $arrView['total_pokok'] = $count;
                 $arrView['total_ditangani'] = $count_sudah;
                 $arrView['persen_ditangani'] = $percentage_sudah;
-
-                $arrView['blok'] = $plotEst;
-                $arrView['pokok'] = $plot_kuning;
+                $arrView['pokok'] = $new_pk;
 
                 break;
 
@@ -438,7 +663,6 @@ class TrackerController extends Controller
                 // dd($plotAfd);
 
 
-
                 $plot_kuning = DB::connection('mysql2')
                     ->table('deficiency_tracker')
                     ->select('deficiency_tracker.*')
@@ -451,8 +675,65 @@ class TrackerController extends Controller
 
                 $plot_kuning = $plot_kuning->groupBy(['blok']);
                 $plot_kuning = json_decode($plot_kuning, true);
+                // dd($plot_kuning['G03']);
 
-                // dd($plot_kuning);
+                $new_pk = array();
+                foreach ($plot_kuning as $key => $value) {
+                    foreach ($value as $key1 => $value1) {
+
+                        if ($value1['jenis_pupuk_id'] != null) {
+                            $pupukx = explode('$', $value1['jenis_pupuk_id']);
+                            // dd($pupukx);
+                            $pupuk = DB::connection('mysql2')
+                                ->table('pupuk')
+                                ->select('pupuk.*')
+                                ->whereIn('pupuk.id', $pupukx) // Pass the array directly to whereIn
+                                ->orderBy('id', 'desc')
+                                ->pluck('nama');
+
+                            $pupuk = json_decode(json_encode($pupuk), true); // Convert the result to an array
+                            $new_ppk = implode("$", $pupuk);
+                        } else {
+                            $new_ppk = null;
+                        }
+
+
+
+
+                        // dd($new_ppk);
+                        $new_pk[$key][$key1]['pupuk'] = $new_ppk;
+                        $new_pk[$key][$key1]['lat'] = $value1['lat'];
+                        $new_pk[$key][$key1]['lon'] = $value1['lon'];
+                        $new_pk[$key][$key1]['blok'] = $value1['blok'];
+                        $new_pk[$key][$key1]['kondisi'] = $value1['kondisi'];
+                        $new_pk[$key][$key1]['status'] = $value1['status'];
+                        $new_pk[$key][$key1]['foto'] = $value1['foto'];
+                        $new_pk[$key][$key1]['komentar'] = $value1['komentar'];
+                        $new_pk[$key][$key1]['id'] = $value1['id'];
+                    }
+                }
+                // dd($new_pk);
+
+                $outputArray = [];
+
+                foreach ($plot_kuning as $key => $value) {
+                    if ($regional == 2 && $estate == 'NKE') {
+                        $newKey = preg_replace('/^P-/', '', $key);
+
+                        // Merge the arrays if the key already exists in the output array
+                        if (isset($outputArray[$newKey])) {
+                            $outputArray[$newKey] = array_merge($outputArray[$newKey], $value);
+                        } else {
+                            $outputArray[$newKey] = $value;
+                        }
+                    } else {
+                        // If conditions are not met, keep the original key and value
+                        $outputArray[$key] = $value;
+                    }
+                }
+
+                // dd($outputArray);
+
                 $datatables = DB::connection('mysql2')
                     ->table('deficiency_tracker')
                     ->select('deficiency_tracker.*')
@@ -508,18 +789,20 @@ class TrackerController extends Controller
                 $drawBlok = json_decode($drawBlok, true);
 
 
-
+                // dd($drawBlok);
                 $new_blok = array();
 
                 foreach ($drawBlok as $key => $value) {
                     $lat_lon = array(); // Initialize lat_lon as an empty array
                     $jumblok = 0; // Initialize jumblok to 0
                     $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
+                    $ket = '-'; // Initialize kategori as 'Blue' by default
 
                     foreach ($value as $key2 => $value2) {
                         $statusCount = 0;
                         $verif = 0;
-                        if ($regional == 2) {
+                        $modifiedKey = '-';
+                        if ($regional == 2 && $estate !== 'NKE') {
                             $modifiedKey =  preg_replace('/0/', '', $key, 1);
                         } else if ($regional == 1 && $estate == 'PLE') {
                             $modifiedKey =  preg_replace('/0/', '', $key, 1);
@@ -538,9 +821,10 @@ class TrackerController extends Controller
                             }
                         }
 
-                        foreach ($plot_kuning as $key3 => $value3) {
+                        foreach ($outputArray as $key3 => $value3) {
 
                             // $test = 'N38-CBI';
+                            $newKey = '-';
                             if (strpos($key3, 'CBI') !== false) {
                                 $parts = explode('-CBI', $key3);
                                 $newKey = $parts[0];
@@ -555,11 +839,11 @@ class TrackerController extends Controller
 
                             // dd($newKey);
                             if ($modifiedKey === $newKey) {
-                                // dd($newKey);
+                                $foundNewKey = $newKey;
                                 foreach ($value3 as $key4 => $value4) {
                                     // Calculate jum_blok for the current key
                                     $jumblok = count($value3);
-
+                                    // dd($value4);
                                     // Check if the 'status' is 'Belum'
                                     if (isset($value4['status']) && $value4['status'] == 'Sudah') {
                                         $statusCount++;
@@ -568,16 +852,32 @@ class TrackerController extends Controller
                                         $verif++;
                                     }
 
-                                    if ($statusCount >= 5 && $jumblok >= 1 && $jumblok <= 5) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount >= 5 && $jumblok >= 6 && $jumblok <= 30) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount == 10 &&  $jumblok == 10) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount >= 10 && $jumblok >= 11 && $jumblok <= 30) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount >= 20 && $jumblok >= 30) {
-                                        $kategori = 'Hijau';
+
+                                    if ($jumblok >= 1000 && $jumblok < 1000) {
+                                        if ($statusCount >= 500) {
+                                            $kategori = 'Hijau';
+                                            $ket = '1000 : 500';
+                                        }
+                                    } elseif ($jumblok >= 30 && $jumblok < 100) {
+                                        if ($statusCount >= 20) {
+                                            $kategori = 'Hijau';
+                                            $ket = '100 : 20';
+                                        }
+                                    } elseif ($jumblok >= 10 && $jumblok <= 30) {
+                                        if ($statusCount >= 10) {
+                                            $kategori = 'Hijau';
+                                            $ket = '11 : 10';
+                                        }
+                                    } elseif ($jumblok  >= 6 && $jumblok < 10) {
+                                        if ($statusCount = 5) {
+                                            $kategori = 'Hijau';
+                                            $ket = '10 : 10';
+                                        }
+                                    } elseif ($jumblok  == 1 && $jumblok < 6) {
+                                        if ($statusCount >= 5) {
+                                            $kategori = 'Hijau';
+                                            $ket = '6 : 5';
+                                        }
                                     }
                                 }
 
@@ -586,8 +886,9 @@ class TrackerController extends Controller
                                     $lon = $value2['lon'];
                                     $lat_lon[] = $lat . ';' . $lon;
                                 }
+
+                                $new_blok[$key]['pokok_namablok'] = $value4['blok'];
                             }
-                            // dd($key, $modifiedKey, $key3);
                         }
                     }
 
@@ -606,15 +907,10 @@ class TrackerController extends Controller
                     $new_blok[$key]['afd_nama'] = $key;
                     $new_blok[$key]['Diverif'] = $verif;
                     $new_blok[$key]['kategori'] = $kategori;
+                    $new_blok[$key]['Ket'] = $ket;
                     $new_blok[$key]['Ditangani'] = $statusCount;
                     $new_blok[$key]['lat_lon'] = $lat_lon;
                 }
-
-
-                // dd($new_blok);
-
-                // dd($new_blok, $drawBlok, $plot_kuning);
-
 
                 $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $datatables;
@@ -623,7 +919,7 @@ class TrackerController extends Controller
                 $arrView['total_ditangani'] = $count_sudah;
                 $arrView['persen_ditangani'] = $percentage_sudah;
                 $arrView['blok'] = $plotAfd;
-                $arrView['pokok'] = $plot_kuning;
+                $arrView['pokok'] = $new_pk;
                 break;
 
             case 'blok':
@@ -642,7 +938,7 @@ class TrackerController extends Controller
                 $plotBlok = json_decode($plotBlok, true);
 
                 // dd($blok);
-                if ($regional == 2) {
+                if ($regional == 2 && $estate !== 'NKE') {
                     $inputString = $blok;
                     $modifiedString = preg_replace('/0/', '', $inputString, 1);
                 } else {
@@ -664,7 +960,7 @@ class TrackerController extends Controller
 
                 $plot_kuning = $plot_kuning->groupBy(['blok']);
                 $plot_kuning = json_decode($plot_kuning, true);
-                // dd($plot_kuning, $blok, $estate);
+
                 $count = array_reduce($plot_kuning, function ($carry, $items) {
                     return $carry + count(array_filter($items, function ($item) {
                         return $item['status'] !== "Sudah";
@@ -686,6 +982,7 @@ class TrackerController extends Controller
                 }
 
 
+
                 $drawBlok = DB::connection('mysql2')
                     ->table('blok')
                     ->select('blok.*', 'estate.est', 'afdeling.nama as afd_nama')
@@ -699,20 +996,38 @@ class TrackerController extends Controller
 
                 $drawBlok = $drawBlok->groupBy(['nama']);
                 $drawBlok = json_decode($drawBlok, true);
-                $values = [];
 
+                $outputArray = [];
 
+                foreach ($plot_kuning as $key => $value) {
+                    if ($regional == 2 && $estate == 'NKE') {
+                        $newKey = preg_replace('/^P-/', '', $key);
 
+                        // Merge the arrays if the key already exists in the output array
+                        if (isset($outputArray[$newKey])) {
+                            $outputArray[$newKey] = array_merge($outputArray[$newKey], $value);
+                        } else {
+                            $outputArray[$newKey] = $value;
+                        }
+                    } else {
+                        // If conditions are not met, keep the original key and value
+                        $outputArray[$key] = $value;
+                    }
+                }
+                // dd($drawBlok, $plot_kuning);
                 $new_blok = array();
+
                 foreach ($drawBlok as $key => $value) {
                     $lat_lon = array(); // Initialize lat_lon as an empty array
                     $jumblok = 0; // Initialize jumblok to 0
                     $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
+                    $ket = '-'; // Initialize kategori as 'Blue' by default
 
                     foreach ($value as $key2 => $value2) {
                         $statusCount = 0;
                         $verif = 0;
-                        if ($regional == 2) {
+                        $modifiedKey = '-';
+                        if ($regional == 2 && $estate !== 'NKE') {
                             $modifiedKey =  preg_replace('/0/', '', $key, 1);
                         } else if ($regional == 1 && $estate == 'PLE') {
                             $modifiedKey =  preg_replace('/0/', '', $key, 1);
@@ -731,9 +1046,10 @@ class TrackerController extends Controller
                             }
                         }
 
-                        foreach ($plot_kuning as $key3 => $value3) {
+                        foreach ($outputArray as $key3 => $value3) {
 
                             // $test = 'N38-CBI';
+                            $newKey = '-';
                             if (strpos($key3, 'CBI') !== false) {
                                 $parts = explode('-CBI', $key3);
                                 $newKey = $parts[0];
@@ -748,11 +1064,11 @@ class TrackerController extends Controller
 
                             // dd($newKey);
                             if ($modifiedKey === $newKey) {
-                                // dd($newKey);
+                                $foundNewKey = $newKey;
                                 foreach ($value3 as $key4 => $value4) {
                                     // Calculate jum_blok for the current key
                                     $jumblok = count($value3);
-
+                                    // dd($value4);
                                     // Check if the 'status' is 'Belum'
                                     if (isset($value4['status']) && $value4['status'] == 'Sudah') {
                                         $statusCount++;
@@ -761,16 +1077,32 @@ class TrackerController extends Controller
                                         $verif++;
                                     }
 
-                                    if ($statusCount >= 5 && $jumblok >= 1 && $jumblok <= 5) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount >= 5 && $jumblok >= 6 && $jumblok <= 30) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount == 10 &&  $jumblok == 10) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount >= 10 && $jumblok >= 11 && $jumblok <= 30) {
-                                        $kategori = 'Hijau';
-                                    } elseif ($statusCount >= 20 && $jumblok >= 30) {
-                                        $kategori = 'Hijau';
+
+                                    if ($jumblok >= 1000 && $jumblok < 1000) {
+                                        if ($statusCount >= 500) {
+                                            $kategori = 'Hijau';
+                                            $ket = '1000 : 500';
+                                        }
+                                    } elseif ($jumblok >= 30 && $jumblok < 100) {
+                                        if ($statusCount >= 20) {
+                                            $kategori = 'Hijau';
+                                            $ket = '100 : 20';
+                                        }
+                                    } elseif ($jumblok >= 10 && $jumblok <= 30) {
+                                        if ($statusCount >= 10) {
+                                            $kategori = 'Hijau';
+                                            $ket = '11 : 10';
+                                        }
+                                    } elseif ($jumblok  >= 6 && $jumblok < 10) {
+                                        if ($statusCount = 5) {
+                                            $kategori = 'Hijau';
+                                            $ket = '10 : 10';
+                                        }
+                                    } elseif ($jumblok  == 1 && $jumblok < 6) {
+                                        if ($statusCount >= 5) {
+                                            $kategori = 'Hijau';
+                                            $ket = '6 : 5';
+                                        }
                                     }
                                 }
 
@@ -779,8 +1111,9 @@ class TrackerController extends Controller
                                     $lon = $value2['lon'];
                                     $lat_lon[] = $lat . ';' . $lon;
                                 }
+
+                                $new_blok[$key]['pokok_namablok'] = $value4['blok'];
                             }
-                            // dd($key, $modifiedKey, $key3);
                         }
                     }
 
@@ -799,20 +1132,70 @@ class TrackerController extends Controller
                     $new_blok[$key]['afd_nama'] = $key;
                     $new_blok[$key]['Diverif'] = $verif;
                     $new_blok[$key]['kategori'] = $kategori;
+                    $new_blok[$key]['Ket'] = $ket;
                     $new_blok[$key]['Ditangani'] = $statusCount;
                     $new_blok[$key]['lat_lon'] = $lat_lon;
                 }
 
 
+                // dd($new_blok);
 
+                foreach ($new_blok as $key => $value) {
+                    # code...
+                    $totalpk = $value['jum_pokok'];
+                    $Ditangani = $value['Ditangani'];
+                    if ($totalpk != 0) {
+                        $progres = round(($Ditangani / $totalpk) * 100, 2);
+                    } else {
+                        // Handle the case where $totalpk is zero (division by zero error)
+                        $progres = 0; // You can set it to zero or handle it differently based on your requirements.
+                    }
+                }
+
+                $new_pk = array();
+                foreach ($plot_kuning as $key => $value) {
+                    foreach ($value as $key1 => $value1) {
+
+                        if ($value1['jenis_pupuk_id'] != null) {
+                            $pupukx = explode('$', $value1['jenis_pupuk_id']);
+                            // dd($pupukx);
+                            $pupuk = DB::connection('mysql2')
+                                ->table('pupuk')
+                                ->select('pupuk.*')
+                                ->whereIn('pupuk.id', $pupukx) // Pass the array directly to whereIn
+                                ->orderBy('id', 'desc')
+                                ->pluck('nama');
+
+                            $pupuk = json_decode(json_encode($pupuk), true); // Convert the result to an array
+                            $new_ppk = implode("$", $pupuk);
+                        } else {
+                            $new_ppk = null;
+                        }
+
+
+
+
+                        // dd($new_ppk);
+                        $new_pk[$key][$key1]['pupuk'] = $new_ppk;
+                        $new_pk[$key][$key1]['lat'] = $value1['lat'];
+                        $new_pk[$key][$key1]['lon'] = $value1['lon'];
+                        $new_pk[$key][$key1]['blok'] = $value1['blok'];
+                        $new_pk[$key][$key1]['kondisi'] = $value1['kondisi'];
+                        $new_pk[$key][$key1]['status'] = $value1['status'];
+                        $new_pk[$key][$key1]['foto'] = $value1['foto'];
+                        $new_pk[$key][$key1]['komentar'] = $value1['komentar'];
+                        $new_pk[$key][$key1]['id'] = $value1['id'];
+                    }
+                }
+                $values = [];
                 $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $values;
                 $arrView['drawBlok'] = $drawBlok;
-                $arrView['total_pokok'] = $count;
+                $arrView['total_pokok'] = $totalpk;
                 $arrView['total_ditangani'] = $count_sudah;
-                $arrView['persen_ditangani'] = $percentage_sudah;
+                $arrView['persen_ditangani'] = $progres;
                 $arrView['blok'] = $plotBlok;
-                $arrView['pokok'] = $plot_kuning;
+                $arrView['pokok'] = $new_pk;
                 break;
 
             default:
