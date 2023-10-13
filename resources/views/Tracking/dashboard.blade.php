@@ -634,14 +634,18 @@
                                     var fotoArray = foto.split('$');
                                     var komentararray = komentar.split('$');
                                     for (var k = 0; k < fotoArray.length; k++) {
-                                        popupContent += `<img class="popup-image" src="https://mobilepro.srs-ssms.com/storage/app/public/deficiency_tracker/${fotoArray[k]}" alt="Foto Temuan" onclick="openModal(this.src, '${komentar}')"><br/>`;
+                                        var imageSrc = `https://mobilepro.srs-ssms.com/storage/app/public/deficiency_tracker/${fotoArray[k]}`;
+                                        var comment = komentararray[k];
+
+                                        popupContent += `<img class="popup-image" src="${imageSrc}" alt="Foto Temuan" onclick="openModal(this.src, '${comment}')"><br/>`;
                                     }
                                 }
+
                                 if (pupuk) {
                                     var komentpupuk = pupuk.split('$');
-
+                                    popupContent += `<strong>Perlakuan: </strong><br/>`;
                                     for (var k = 0; k < komentpupuk.length; k++) {
-                                        popupContent += `<strong>Pupuk: </strong>${komentpupuk[k]}<br/>`;
+                                        popupContent += `- ${komentpupuk[k]}<br/>`;
 
                                     }
                                 }

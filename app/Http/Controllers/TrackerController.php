@@ -368,8 +368,10 @@ class TrackerController extends Controller
 
                             $pupuk = json_decode(json_encode($pupuk), true); // Convert the result to an array
                             $new_ppk = implode("$", $pupuk);
+                            $komnt_ppk = implode(" - ", $pupuk);
                         } else {
                             $new_ppk = null;
+                            $komnt_ppk = null;
                         }
 
 
@@ -377,6 +379,7 @@ class TrackerController extends Controller
 
                         // dd($new_ppk);
                         $new_pk[$key][$key1]['pupuk'] = $new_ppk;
+                        $new_pk[$key][$key1]['ppk_kmn'] = $komnt_ppk;
                         $new_pk[$key][$key1]['lat'] = $value1['lat'];
                         $new_pk[$key][$key1]['lon'] = $value1['lon'];
                         $new_pk[$key][$key1]['blok'] = $value1['blok'];
@@ -613,8 +616,10 @@ class TrackerController extends Controller
 
                             $pupuk = json_decode(json_encode($pupuk), true); // Convert the result to an array
                             $new_ppk = implode("$", $pupuk);
+                            $komnt_ppk = implode(" - ", $pupuk);
                         } else {
                             $new_ppk = null;
+                            $komnt_ppk = null;
                         }
 
 
@@ -622,6 +627,7 @@ class TrackerController extends Controller
 
                         // dd($new_ppk);
                         $new_pk[$key][$key1]['pupuk'] = $new_ppk;
+                        $new_pk[$key][$key1]['ppk_kmn'] = $komnt_ppk;
                         $new_pk[$key][$key1]['lat'] = $value1['lat'];
                         $new_pk[$key][$key1]['lon'] = $value1['lon'];
                         $new_pk[$key][$key1]['blok'] = $value1['blok'];
@@ -693,8 +699,10 @@ class TrackerController extends Controller
 
                             $pupuk = json_decode(json_encode($pupuk), true); // Convert the result to an array
                             $new_ppk = implode("$", $pupuk);
+                            $komnt_ppk = implode(" - ", $pupuk);
                         } else {
                             $new_ppk = null;
+                            $komnt_ppk = null;
                         }
 
 
@@ -702,6 +710,7 @@ class TrackerController extends Controller
 
                         // dd($new_ppk);
                         $new_pk[$key][$key1]['pupuk'] = $new_ppk;
+                        $new_pk[$key][$key1]['ppk_kmn'] = $komnt_ppk;
                         $new_pk[$key][$key1]['lat'] = $value1['lat'];
                         $new_pk[$key][$key1]['lon'] = $value1['lon'];
                         $new_pk[$key][$key1]['blok'] = $value1['blok'];
@@ -1168,8 +1177,10 @@ class TrackerController extends Controller
 
                             $pupuk = json_decode(json_encode($pupuk), true); // Convert the result to an array
                             $new_ppk = implode("$", $pupuk);
+                            $komnt_ppk = implode(" - ", $pupuk);
                         } else {
                             $new_ppk = null;
+                            $komnt_ppk = null;
                         }
 
 
@@ -1177,6 +1188,7 @@ class TrackerController extends Controller
 
                         // dd($new_ppk);
                         $new_pk[$key][$key1]['pupuk'] = $new_ppk;
+                        $new_pk[$key][$key1]['ppk_kmn'] = $komnt_ppk;
                         $new_pk[$key][$key1]['lat'] = $value1['lat'];
                         $new_pk[$key][$key1]['lon'] = $value1['lon'];
                         $new_pk[$key][$key1]['blok'] = $value1['blok'];
