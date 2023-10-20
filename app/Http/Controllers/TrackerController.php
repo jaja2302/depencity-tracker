@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http; // Use Http client for Laravel
 use Illuminate\Support\Collection; // Import Laravel's Collection class
+use App\Models\DeficiencyTracker;
+use App\Models\Estate;
+use App\Models\Afdeling;
 
 class TrackerController extends Controller
 {
@@ -267,6 +270,7 @@ class TrackerController extends Controller
         // dd($blok_afd, $pk_kuning);
         // dd($result);
 
+        // $datatables = json_decode($datatables, true);
 
 
         // Your dashboard logic goes here
@@ -1361,6 +1365,7 @@ class TrackerController extends Controller
                     $new_blok[$key]['lat_lon'] = $lat_lon;
                 }
 
+                // dd($new_blok);
                 foreach ($new_blok as $key => $value) {
                     $ktg[] = $key;
                     $sudah[] = $value['Ditangani'];
@@ -2021,5 +2026,68 @@ class TrackerController extends Controller
             ->where('id', $id)->update([
                 'blok' => $blok,
             ]);
+    }
+
+    public function getData(Request $request)
+    {
+
+        $regional = $request->input('regional');
+        $estate = $request->input('estate');
+        $afdeling = $request->input('afdeling');
+        $blok = $request->input('blok');
+        $dataType = $request->input('dataType'); // Retrieve the dataType
+
+        $arrView = array();
+        // dd($regional, $dataType);
+        switch ($dataType) {
+            case 'regional':
+
+                $arrView['datatables'] = [];
+                break;
+            case 'estate':
+                $data_est = Estate::where('est', $estate)->with('dtracker_est')->first();
+
+                // dd($estate);
+                $dtracker_est = $data_est->dtracker_est;
+                $dtracker_est = json_decode($dtracker_est, true);
+
+                $arrView['datatables'] = $dtracker_est;
+                break;
+            case 'afdeling':
+                // dd($afdeling);
+
+                $datatables = DB::connection('mysql2')
+                    ->table('deficiency_tracker')
+                    ->select('deficiency_tracker.*', 'afdeling.*', 'estate.*')
+                    ->join('afdeling', 'afdeling.estate', '=', 'estate.id')
+                    ->join('estate', 'estate.id', '=', 'afdeling.estate')
+                    ->where('estate.est', '=', $estate)
+                    ->where('afdeling.id', '=', $afdeling)
+                    // ->whereNotIn('id', [353])
+                    ->orderBy('id', 'desc') // Sort by 'id' column in descending order
+                    ->get();
+
+                dd($datatables);
+
+                $datatables = json_decode($datatables, true);
+
+                $data_est = Estate::where('est', $estate)->with('dtracker_est')->first();
+
+                // dd($estate);
+                $dtracker_est = $data_est->dtracker_est;
+                $dtracker_est = json_decode($dtracker_est, true);
+
+                $arrView['datatables'] = $dtracker_est;
+                break;
+            case 'blok':
+
+                break;
+            default:
+                # code...
+                break;
+        }
+
+        echo json_encode($arrView);
+        exit();
     }
 }

@@ -125,10 +125,6 @@
 
 
     <div class="row mt-10">
-
-
-
-
         <div class="col-lg-12">
             <div class="radio-group">
                 <!-- Radio button for "Regional" -->
@@ -233,8 +229,34 @@
         </div>
     </div>
 
+    <div class="row" style="padding-top: 20px;">
+        <div class="col-xl-12">
+            <div class="top-cat-title" style="padding-top: 10px;">
+                <h3>Data Table </h3>
+                <p>List Pokok</p>
+            </div>
+            <div class="table-responsive" style="background-color: white;">
 
-    <div class="container-fluid" id="blok_pemupukan" style="display: none;">
+                <div class="dt-buttons">
+                    <!-- Remove these button elements -->
+                </div>
+
+                <table class="table table-striped table-bordered" id="list_pokok" style="background-color: white;">
+                    <thead>
+                        <!-- Table header content -->
+                    </thead>
+                    <tbody>
+                        <!-- Table body content will be dynamically generated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class=" container-fluid" id="blok_pemupukan" style="display: none;">
         <div class="top-cat-title" style="padding-top: 10px;">
             <h3>Pemupukan </h3>
             <p>Data perblok</p>
@@ -692,13 +714,19 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
-
-<!-- datables  -->
-<link href="https://cdn.datatables.net/v/dt/dt-1.13.6/datatables.min.css" rel="stylesheet">
-
-<script src="https://cdn.datatables.net/v/dt/dt-1.13.6/datatables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
+<link href="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/datatables.min.css" rel="stylesheet">
+
+
+<link href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/cr-1.7.0/date-1.5.1/fc-4.3.0/r-2.5.0/rr-1.4.1/sc-2.2.0/sb-1.6.0/sp-2.2.0/datatables.min.css" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/cr-1.7.0/date-1.5.1/fc-4.3.0/r-2.5.0/rr-1.4.1/sc-2.2.0/sb-1.6.0/sp-2.2.0/datatables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
 <script>
     let user_name = "{{ session('user_name') }}";
     var options = {
@@ -890,9 +918,6 @@
 
 
     $(document).ready(function() {
-
-
-
         var group = L.layerGroup();
 
         // Initialize the map and set its view
@@ -916,60 +941,6 @@
         var markerBlok = L.markerClusterGroup().addTo(map);
 
         map.addLayer(areaMapsLayer);
-
-
-
-
-        // function drawMaps(regions) {
-        //     areaMapsLayer.clearLayers(); // Clear area maps layer only
-
-        //     var bounds = new L.LatLngBounds(); // Create a bounds object to store the coordinates
-
-        //     for (var i = 0; i < regions.length; i++) {
-        //         var regionData = regions[i][1];
-
-        //         // Check if regionData is an array
-        //         if (Array.isArray(regionData)) {
-        //             // Initialize an array to store coordinates for the polyline
-        //             var coordinates = [];
-
-        //             // Loop through the array of objects within regionData
-        //             for (var j = 0; j < regionData.length; j++) {
-        //                 var obj = regionData[j];
-        //                 var lat = obj.lat;
-        //                 var lon = obj.lon;
-        //                 var afd_nama = obj.nama;
-
-        //                 // Create a LatLng object for each coordinate
-        //                 var latLng = new L.LatLng(lat, lon);
-
-        //                 // Extend the bounds with the new LatLng object
-        //                 bounds.extend(latLng);
-        //                 coordinates.push(latLng);
-        //             }
-
-        //             // var polygon = L.polygon(coordinates).addTo(areaMapsLayer);
-
-        //             var polygon = L.polygon(coordinates, {
-        //                 fillOpacity: 0.05, // Set the fill opacity to a low value
-        //                 opacity: 0.5 // Set the border opacity to a low value
-        //             }).addTo(areaMapsLayer);
-
-        //             var polygonCenter = polygon.getBounds().getCenter();
-
-        //             var label = L.marker(polygonCenter, {
-        //                 icon: L.divIcon({
-        //                     className: 'label-blok',
-        //                     html: afd_nama,
-        //                     iconSize: [50, 10],
-        //                 })
-        //             }).addTo(areaMapsLayer);
-        //         }
-        //     }
-
-        //     // Fit the map to the calculated bounds
-        //     map.fitBounds(bounds);
-        // }
 
         function drawPokok(pokok) {
             markersLayer.clearLayers(); // Clear markers layer only
@@ -1089,7 +1060,6 @@
                             var komentar = obj.komentar;
                             var id = obj.id;
                             var pupuk = obj.pupuk;
-                            var afd = obj.afd;
 
                             if ((statusFilter === "all" || statusFilter === status) && (kondisiFilter === "all" || kondisiFilter === kondisi)) {
                                 var icon;
@@ -1113,7 +1083,6 @@
                                 popupContent += `<strong>Kondisi: </strong>${kondisi}<br/>`;
                                 popupContent += `<strong>Status: </strong>${status}<br/>`;
                                 popupContent += `<strong>ID: </strong>${id}<br/>`;
-                                popupContent += `<strong>Afdeling: </strong>${afd}<br/>`;
 
                                 if (foto) {
                                     var fotoArray = foto.split('$');
@@ -1320,19 +1289,23 @@
             if ($.fn.DataTable.isDataTable('#user_qc')) {
                 $('#user_qc').DataTable().destroy();
             }
+
+            if ($.fn.DataTable.isDataTable('#list_pokok')) {
+                $('#list_pokok').DataTable().destroy();
+            }
             requestData['dataType'] = dataType;
 
 
-            // Swal.fire({
-            //     title: 'Loading',
-            //     html: '<span class="loading-text">Mohon Tunggu...</span>',
-            //     allowOutsideClick: false,
-            //     showConfirmButton: false,
-            //     willOpen: () => {
-            //         Swal.showLoading();
-            //     }
+            Swal.fire({
+                title: 'Loading',
+                html: '<span class="loading-text">Mohon Tunggu...</span>',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
 
-            // });
+            });
 
             // Perform the AJAX request with the requestData
             $.ajax({
@@ -1655,11 +1628,68 @@
 
                 },
                 error: function(xhr, textStatus, errorThrown) {
-                    console.error('AJAX error:', errorThrown);
+                    Swal.close();
+                    Swal.fire({
+                        title: 'Blok Coordinat belum tersedia!',
+                        text: 'Coordinat masih dalam progress',
+                        icon: 'error',
+                    });
                 }
             });
 
 
+            $.ajax({
+                url: "{{ route('getData') }}",
+                method: 'GET',
+                data: requestData,
+                success: function(result) {
+                    Swal.close();
+                    var plot = JSON.parse(result);
+
+
+                    var listQC = $('#list_pokok').DataTable({
+                        columns: [{
+                                title: 'Estate',
+                                data: 'est',
+                            },
+                            {
+                                title: 'Afdeling',
+                                data: 'afd',
+                            },
+                            {
+                                title: 'Blok',
+                                data: 'blok',
+                            },
+                            {
+                                title: 'Kondisi Pokok',
+                                data: 'kondisi',
+                            }, {
+                                title: 'Status Penanganan',
+                                data: 'status',
+                            },
+
+                        ],
+                        // Initialize DataTable buttons
+                        dom: 'Bfrtip',
+                        buttons: ['excel', 'pdf', ],
+                    });
+
+                    // Populate DataTable with data
+                    listQC.clear().rows.add(plot['datatables']).draw();
+
+
+
+                },
+                error: function(xhr, textStatus, errorThrown) {
+
+                    Swal.fire({
+                        title: 'Blok Coordinat belum tersedia!',
+                        text: 'Coordinat masih dalam progress',
+                        icon: 'error',
+                    });
+                    Swal.close();
+                }
+            });
 
             // end ajax 
         });

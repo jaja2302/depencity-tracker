@@ -15,4 +15,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getBlok', [TrackerController::class, 'getBlok'])->name('getBlok');
     Route::get('/drawMaps', [TrackerController::class, 'drawMaps'])->name('drawMaps');
     Route::post('/updateUserqc', [TrackerController::class, 'updateUserqc'])->name('updateUserqc');
+    Route::get('/getData', [TrackerController::class, 'getData'])->name('getData');
 });
