@@ -18,8 +18,7 @@ class Afdeling extends Model
         return $this->belongsTo(Estate::class, 'estate', 'id');
     }
 
-
-    public function dtracker_afd()
+    public function deficiencyTrackers()
     {
         return $this->hasMany(DeficiencyTracker::class, 'afd', 'nama');
     }

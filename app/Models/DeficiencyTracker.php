@@ -17,4 +17,14 @@ class DeficiencyTracker extends Model
     {
         return $this->belongsTo(Estate::class, 'est', 'est');
     }
+
+    public function estate()
+    {
+        return $this->belongsTo(Estate::class, 'est', 'est');
+    }
+
+    public function afdeling()
+    {
+        return $this->belongsTo(Afdeling::class, 'afd', 'nama');
+    }
 }

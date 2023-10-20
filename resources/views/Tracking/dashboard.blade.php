@@ -229,7 +229,7 @@
         </div>
     </div>
 
-    <div class="row" style="padding-top: 20px;">
+    <div class="row" id="table_data" style="display: none;padding-top: 20px">
         <div class="col-xl-12">
             <div class="top-cat-title" style="padding-top: 10px;">
                 <h3>Data Table </h3>
@@ -1217,6 +1217,7 @@
             var blokOption = document.getElementById('blok-option');
 
             var container = document.getElementById("blok_pemupukan");
+            var table_data = document.getElementById("table_data");
 
             // Hide all filter options initially
             regionalOption.style.display = 'none';
@@ -1224,23 +1225,28 @@
             afdelingOption.style.display = 'none';
             blokOption.style.display = 'none';
             container.style.display = 'none';
+            table_data.style.display = 'none';
 
             // Show the selected filter option(s)
             if (option === 'Regional') {
                 regionalOption.style.display = 'block';
+                // table_data.style.display = 'block';
             } else if (option === 'Estate') {
                 regionalOption.style.display = 'block';
                 estateOption.style.display = 'block';
+                table_data.style.display = 'block';
             } else if (option === 'Afdeling') {
                 regionalOption.style.display = 'block';
                 estateOption.style.display = 'block';
                 afdelingOption.style.display = 'block';
+                table_data.style.display = 'block';
             } else if (option === 'Blok') {
                 regionalOption.style.display = 'block';
                 estateOption.style.display = 'block';
                 afdelingOption.style.display = 'block';
                 blokOption.style.display = 'block';
                 container.style.display = 'block';
+                table_data.style.display = 'block';
             } else {
                 // Handle any other cases or defaults here
             }
@@ -1647,7 +1653,9 @@
                     var plot = JSON.parse(result);
 
 
-                    var listQC = $('#list_pokok').DataTable({
+                    var DataTables = $('#list_pokok').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: ['excel', 'pdf', ],
                         columns: [{
                                 title: 'Estate',
                                 data: 'est',
@@ -1670,12 +1678,12 @@
 
                         ],
                         // Initialize DataTable buttons
-                        dom: 'Bfrtip',
-                        buttons: ['excel', 'pdf', ],
+
                     });
 
-                    // Populate DataTable with data
-                    listQC.clear().rows.add(plot['datatables']).draw();
+                    DataTables.clear().rows.add(plot['datatables']).draw();
+
+
 
 
 
