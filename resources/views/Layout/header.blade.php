@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Dtracker Dashboard | SSMS</title>
-    <!-- Favicon -->
+    <!-- Favlogouticon -->
     <link rel="shortcut icon" href="{{asset('img/logo-SSS.png')}}" type="image/x-icon">
     <!-- Custom styles -->
     <link rel="stylesheet" href="{{asset('elegant/css/style.min.css')}}">

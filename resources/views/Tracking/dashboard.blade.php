@@ -1,6 +1,62 @@
 @include('Layout.header')
 
+<style>
+    @media (max-width: 768px) {
 
+        /* Adjust the max-width as needed */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .option-select {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 10px;
+            margin-left: 0;
+        }
+
+        .option-select label {
+            margin-right: 0;
+        }
+    }
+
+    .loading-text {
+        animation: fadeInOut 2s ease-in-out infinite;
+    }
+
+    @media (min-width: 769px) {
+
+        /* Adjust the min-width as needed */
+        .radio-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            /* Align to the left and right */
+        }
+
+        .radio-group .radio-options {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            margin-right: 20px;
+            /* Adjust the margin as needed */
+        }
+
+        .radio-group label {
+            margin: 0;
+            /* Remove margin from labels */
+        }
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+</style>
 
 
 <div class="container">
@@ -65,62 +121,8 @@
 
     </div>
     <br>
-    <!-- Mobile version -->
-    <style>
-        @media (max-width: 768px) {
 
-            /* Adjust the max-width as needed */
-            .radio-group {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-            }
 
-            .option-select {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                margin-top: 10px;
-                margin-left: 0;
-            }
-
-            .option-select label {
-                margin-right: 0;
-            }
-        }
-
-        .loading-text {
-            animation: fadeInOut 2s ease-in-out infinite;
-        }
-    </style>
-
-    <!-- Windows version (using your existing code) -->
-    <style>
-        @media (min-width: 769px) {
-
-            /* Adjust the min-width as needed */
-            .radio-group {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                /* Align to the left and right */
-            }
-
-            .radio-group .radio-options {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                margin-right: 20px;
-                /* Adjust the margin as needed */
-            }
-
-            .radio-group label {
-                margin: 0;
-                /* Remove margin from labels */
-            }
-        }
-    </style>
 
     <div class="row mt-10">
 
@@ -210,12 +212,418 @@
 
 
     </div>
+    <br>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="top-cat-title">
+                <h3>Persentase </h3>
+                <p>Perlakuan Pokok Kuning</p>
+            </div>
+            <div id="chart" style="background-color: white;">
+                <!-- Your chart content here -->
+            </div>
+            <div class="top-cat-title" style="padding-top: 10px;">
+                <h3>Persentase </h3>
+                <p>Total Pokok Kuning</p>
+            </div>
+            <div id="chartPie" style="background-color: white;">
+                <!-- Your chart content here -->
+            </div>
+        </div>
+    </div>
 
 
+    <div class="container-fluid" id="blok_pemupukan" style="display: none;">
+        <div class="top-cat-title" style="padding-top: 10px;">
+            <h3>Pemupukan </h3>
+            <p>Data perblok</p>
+
+        </div>
+        <div class="row">
+
+            <div class="col-lg-4">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            Rekom
+                            <p class="tahun_mulai" style="font-size: 15px; border-top: 1px solid black;">2023</p>
+                        </div>
+                        <div class="card-body" style="background-color: #163D24; border-radius: 20px; text-align: center; height: 100px; display: flex; align-items: center;">
+                            <h1 class="card-text" id="pk_1" style="font-size: 1rem; margin: 0 auto;color:white;">-</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            Realisasi
+                            <p class="tahun_progres" style="font-size: 15px; border-top: 1px solid black;">2023</p>
+                        </div>
+                        <div class="card-body" style="background-color: #253272; border-radius: 20px; text-align: center; height: 100px; display: flex; align-items: center;">
+                            <h1 class="card-text" id="pk_2" style="font-size: 1rem; margin: 0 auto;color:white;">-</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            Progress
+                            <p class="tahun_realisasi" style="font-size: 15px; border-top: 1px solid black;">2023</p>
+                        </div>
+                        <div class="card-body" style="background-color: #26164C; border-radius: 20px; text-align: center; height: 100px; display: flex; align-items: center;">
+                            <h1 class="card-text" id="pk_3" style="font-size: 1rem; margin: 0 auto;color:white;">-</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="margin-top: 50px;">
+            <div class="col-lg-4">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            Rekom
+                            <p class="tahun_mulai" style="font-size: 15px; border-top: 1px solid black;">2023</p>
+                        </div>
+                        <div class="card-body" style="background-color: #163D24; border-radius: 20px; text-align: center; height: 100px; display: flex; align-items: center;">
+                            <h1 class="card-text" id="pk_4" style="font-size: 1rem; margin: 0 auto;color:white;">-</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            Realisasi
+                            <p class="tahun_progres" style="font-size: 15px; border-top: 1px solid black;">2023</p>
+                        </div>
+                        <div class="card-body" style="background-color: #253272; border-radius: 20px; text-align: center; height: 100px; display: flex; align-items: center;">
+                            <h1 class="card-text" id="pk_5" style="font-size: 1rem; margin: 0 auto;color:white;">-</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            Progress
+                            <p class="tahun_realisasi" style="font-size: 15px; border-top: 1px solid black;">2023</p>
+                        </div>
+                        <div class="card-body" style="background-color: #26164C; border-radius: 20px; text-align: center; height: 100px; display: flex; align-items: center;">
+                            <h1 class="card-text" id="pk_6" style="font-size: 1rem; margin: 0 auto;color:white;">-</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="top-cat-title" style="margin-top: 30px;">
+            <h3>Status Hara Tanaman</h3>
+            <p>(LSU)</p>
+        </div>
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            <table style="padding-left: 15px;">
+                                <thead>
+                                    <tr style="background-color: #6c7cd2; border-radius: 20px; height: 15%;">
+                                        <th rowspan="3" style="text-align: left;font-size:30px;color:#1F2772">N</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center ; color: #6c7cd2">Hara Makro</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center; color: #3d3a9f">Nitrogen</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_1" style="background-color: #ff5424; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_mulai" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_1" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_2" style="background-color: #ff5424; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_belum" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_2" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            <table style="padding-left: 15px;">
+                                <thead>
+                                    <tr style="background-color: #6c7cd2; border-radius: 20px; height: 15%;">
+                                        <th rowspan="3" style="text-align: left;font-size:30px;color:#1F2772">P</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center ; color: #6c7cd2">Hara Makro</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center; color: #1F2772">Fosfor</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_3" style="background-color: #3c58b0; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_mulai" style="text-align:left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_3" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_4" style="background-color: #08948c; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_belum" style="text-align:left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_4" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            <table style="padding-left: 15px;">
+                                <thead>
+                                    <tr style="background-color: #fcdce0; border-radius: 20px; height: 15%;">
+                                        <th rowspan="3" style="text-align: left;font-size:30px;color:#aa2227">K</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center ; color: #fcdce0">Hara Makro</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center; color: #aa2227">Kalium</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_5" style="background-color: #3c58b0; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_mulai" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_5" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_6" style="background-color: #90c44c; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_belum" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_6" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            <table style="padding-left: 15px;">
+                                <thead>
+                                    <tr style="background-color: #b6f8fb; border-radius: 20px; height: 15%;">
+                                        <th rowspan="3" style="text-align: left;font-size:30px;color:#4cbdd1">B</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center ; color: #b6f8fb">Hara Makro</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center; color: #4cbdd1">Baron</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_7" style="background-color: #FF6C17; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_mulai" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_7" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_8" style="background-color: #FF6C17; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_belum" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_8" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row" style="padding-top: 50px;">
+            <div class="col-sm-3">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            <table style="padding-left: 15px;">
+                                <thead>
+                                    <tr style="background-color: #faf5c8; border-radius: 20px; height: 15%;">
+                                        <th rowspan="3" style="text-align: left;font-size:30px;color:#f6de6f">Mg</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center ; color: #f6de6f">Hara Makro</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center; color: #d9b754">Magnesium</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_9" style="background-color: #ff5424; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_mulai" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_9" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_10" style="background-color: #ff5424; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_belum" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_10" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            <table style="padding-left: 15px;">
+                                <thead>
+                                    <tr style="background-color: #faf5c8; border-radius: 20px; height: 15%;">
+                                        <th rowspan="3" style="text-align: left;font-size:30px;color:#f6de6f">Ca</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center ; color: #f6de6f">Hara Makro</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center; color: #d9b754">Kalsium</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_11" style="background-color: #3c58b0; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_mulai" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_11" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_12" style="background-color: #08948c; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_belum" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_12" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            <table style="padding-left: 15px;">
+                                <thead>
+                                    <tr style="background-color: #bff1c4; border-radius: 20px; height: 15%;">
+                                        <th rowspan="3" style="text-align: left;font-size:30px;color:#71c99c">Cu</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center ; color: #71c99c">Hara Makro</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center; color: #5aa963">Tembaga</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_13" style="background-color: #3c58b0; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_mulai" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_13" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_14" style="background-color: #90c44c; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_belum" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_14" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="card-wrapper">
+                    <div class="card" style="background-color: white; border-radius: 20px; transition: transform 0.3s, box-shadow 0.3s;">
+                        <div class="card-header" style="text-align: center;">
+                            <table style="padding-left: 15px;">
+                                <thead>
+                                    <tr style="background-color: #bff1c4; border-radius: 20px; height: 15%;">
+                                        <th rowspan="3" style="text-align: left;font-size:30px;color:#71c99c">Zn</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center ; color: #71c99c">Hara Makro</th>
+                                    </tr>
+                                    <tr style="display: flex;">
+                                        <th style="text-align: center; color: #5aa963">Zink</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_15" style="background-color: #FF6C17; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_mulai" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_15" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="card-body" id="bg_16" style="background-color: #FF6C17; border-radius: 20px; height: 100px; width: 100px; display: flex; flex-direction: column;color: white; font-size: 1rem; margin: 0 auto;">
+                                    <p class="tahun_belum" style="text-align: left;padding-left:10px; font-size: 10px;padding-top :10px">2023</p>
+                                    <h1 class="card-text" id="km_16" style="font-size: 10px; color: white; text-align: center; padding-left: 2px;padding-top:30px">-</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
 
     </body>
-
-
     <style>
         /* CSS for legend styling */
         .info.legend {
@@ -289,9 +697,84 @@
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.6/datatables.min.css" rel="stylesheet">
 
 <script src="https://cdn.datatables.net/v/dt/dt-1.13.6/datatables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
 <script>
     let user_name = "{{ session('user_name') }}";
+    var options = {
+        series: [{
+            name: '-',
+            data: [44, 55, 57, 56, 61, 58, 63, 60, 66]
+        }, {
+            name: '-',
+            data: [76, 85, 101, 98, 87, 105, 91, 114, 94]
+        }, {
+            name: '-',
+            data: [35, 41, 36, 26, 45, 48, 52, 53, 41]
+        }],
+        chart: {
+            type: 'bar',
+            height: 350
+        },
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: '55%',
+                endingShape: 'rounded'
+            },
+        },
+        dataLabels: {
+            enabled: false
+        },
+        stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent']
+        },
+        xaxis: {
+            categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+        },
+        yaxis: {
+            title: {
+                text: 'Pokok'
+            }
+        },
+        fill: {
+            opacity: 1
+        },
+        tooltip: {
 
+        }
+    };
+
+    var chart = new ApexCharts(document.querySelector("#chart"), options);
+
+    chart.render();
+
+
+    var DonutChart = {
+        series: [44, 55, 13, 43, 22],
+        chart: {
+            height: '80%', // Set the height to 50% of its container
+            width: '100%', // Set the width to 100% of its container
+            type: 'pie',
+        },
+        labels: ['-', '-', '-', '-', '-'],
+        responsive: [{
+            breakpoint: 480,
+            DonutChart: {
+                chart: {
+                    width: 200
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }]
+    };
+
+    var Dunut = new ApexCharts(document.querySelector("#chartPie"), DonutChart);
+    Dunut.render();
 
     function openModal(src, komentar) {
         Swal.fire({
@@ -606,6 +1089,7 @@
                             var komentar = obj.komentar;
                             var id = obj.id;
                             var pupuk = obj.pupuk;
+                            var afd = obj.afd;
 
                             if ((statusFilter === "all" || statusFilter === status) && (kondisiFilter === "all" || kondisiFilter === kondisi)) {
                                 var icon;
@@ -629,6 +1113,7 @@
                                 popupContent += `<strong>Kondisi: </strong>${kondisi}<br/>`;
                                 popupContent += `<strong>Status: </strong>${status}<br/>`;
                                 popupContent += `<strong>ID: </strong>${id}<br/>`;
+                                popupContent += `<strong>Afdeling: </strong>${afd}<br/>`;
 
                                 if (foto) {
                                     var fotoArray = foto.split('$');
@@ -762,11 +1247,14 @@
             var afdelingOption = document.getElementById('afdeling-option');
             var blokOption = document.getElementById('blok-option');
 
+            var container = document.getElementById("blok_pemupukan");
+
             // Hide all filter options initially
             regionalOption.style.display = 'none';
             estateOption.style.display = 'none';
             afdelingOption.style.display = 'none';
             blokOption.style.display = 'none';
+            container.style.display = 'none';
 
             // Show the selected filter option(s)
             if (option === 'Regional') {
@@ -783,6 +1271,7 @@
                 estateOption.style.display = 'block';
                 afdelingOption.style.display = 'block';
                 blokOption.style.display = 'block';
+                container.style.display = 'block';
             } else {
                 // Handle any other cases or defaults here
             }
@@ -798,6 +1287,7 @@
 
 
         });
+
 
 
         $('#btnShow').on('click', function() {
@@ -833,16 +1323,16 @@
             requestData['dataType'] = dataType;
 
 
-            Swal.fire({
-                title: 'Loading',
-                html: '<span class="loading-text">Mohon Tunggu...</span>',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
+            // Swal.fire({
+            //     title: 'Loading',
+            //     html: '<span class="loading-text">Mohon Tunggu...</span>',
+            //     allowOutsideClick: false,
+            //     showConfirmButton: false,
+            //     willOpen: () => {
+            //         Swal.showLoading();
+            //     }
 
-            });
+            // });
 
             // Perform the AJAX request with the requestData
             $.ajax({
@@ -860,6 +1350,7 @@
                     var totalx = plot['total_pokok'];
                     var total_ditangani = plot['total_ditangani'];
                     var persen_ditangani = plot['persen_ditangani'];
+                    var pemupukan = plot['pemupukan'];
                     // console.log(totalx);
 
                     const totalPkElement = document.getElementById("total_pk");
@@ -883,8 +1374,140 @@
                     } else {
                         console.error("Element with id 'total_pk' not found.");
                     }
+                    // console.log(pemupukan);
 
-                    // console.log(requestData);
+                    const pk1 = document.getElementById("pk_1");
+                    pk1.textContent = pemupukan['rekom1'] + ' ' + 'ton/blok';
+                    const pk2 = document.getElementById("pk_2");
+                    pk2.textContent = pemupukan['realisasi1'] + ' ' + 'ton/blok';
+                    const pk3 = document.getElementById("pk_3");
+                    pk3.textContent = pemupukan['progress1'] + ' ' + '%';
+                    const pk4 = document.getElementById("pk_4");
+                    pk4.textContent = pemupukan['rekom2'] + ' ' + 'kg/blok';
+                    const pk5 = document.getElementById("pk_5");
+                    pk5.textContent = pemupukan['realisasi2'] + ' ' + 'kg/blok';
+                    const pk6 = document.getElementById("pk_6");
+                    pk6.textContent = pemupukan['progress2'] + ' ' + '%';
+
+
+                    const checkVal = (value) => {
+                        if (value === 'Defisiensi') {
+                            return {
+                                backgroundColor: '#ff5424'
+                            };
+                        } else if (value === 'Low') {
+                            return {
+                                backgroundColor: '#ffc404'
+                            };
+                        } else if (value === 'Optimum') {
+                            return {
+                                backgroundColor: '#4454bc'
+                            };
+                        } else if (value === 'High') {
+                            return {
+                                backgroundColor: '#8cc454'
+                            };
+                        } else if (value === 'Exceed') {
+                            return {
+                                backgroundColor: '#08948c'
+                            };
+                        } else if (value === 'Suff') {
+                            return {
+                                backgroundColor: '#734b4b'
+                            };
+                        } else {
+                            return {
+                                backgroundColor: '#484444'
+                            };
+                        }
+                    };
+
+
+                    const km_1 = document.getElementById("km_1");
+                    const bg_1 = document.getElementById("bg_1");
+                    km_1.textContent = pemupukan['status_1'];
+                    bg_1.style.backgroundColor = checkVal(pemupukan['status_1']).backgroundColor;
+                    const km_2 = document.getElementById("km_2");
+                    const bg_2 = document.getElementById("bg_2");
+                    km_2.textContent = pemupukan['status_2'];
+                    bg_2.style.backgroundColor = checkVal(pemupukan['status_2']).backgroundColor;
+                    const km_3 = document.getElementById("km_3");
+                    const bg_3 = document.getElementById("bg_3");
+                    km_3.textContent = pemupukan['status_3'];
+                    bg_3.style.backgroundColor = checkVal(pemupukan['status_3']).backgroundColor;
+                    const km_4 = document.getElementById("km_4");
+                    const bg_4 = document.getElementById("bg_4");
+                    km_4.textContent = pemupukan['status_4'];
+                    bg_4.style.backgroundColor = checkVal(pemupukan['status_4']).backgroundColor;
+                    const km_5 = document.getElementById("km_5");
+                    const bg_5 = document.getElementById("bg_5");
+                    km_5.textContent = pemupukan['status_5'];
+                    bg_5.style.backgroundColor = checkVal(pemupukan['status_5']).backgroundColor;
+                    const km_6 = document.getElementById("km_6");
+                    const bg_6 = document.getElementById("bg_6");
+                    km_6.textContent = pemupukan['status_6'];
+                    bg_6.style.backgroundColor = checkVal(pemupukan['status_6']).backgroundColor;
+                    const km_7 = document.getElementById("km_7");
+                    const bg_7 = document.getElementById("bg_7");
+                    km_7.textContent = pemupukan['status_7'];
+                    bg_7.style.backgroundColor = checkVal(pemupukan['status_7']).backgroundColor;
+                    const km_8 = document.getElementById("km_8");
+                    const bg_8 = document.getElementById("bg_8");
+                    km_8.textContent = pemupukan['status_8'];
+                    bg_8.style.backgroundColor = checkVal(pemupukan['status_8']).backgroundColor;
+                    const bg_9 = document.getElementById("bg_9");
+                    const km_9 = document.getElementById("km_9");
+                    bg_9.style.backgroundColor = checkVal(pemupukan['status_9']).backgroundColor;
+                    km_9.textContent = pemupukan['status_9'];
+                    const bg_10 = document.getElementById("bg_10");
+                    const km_10 = document.getElementById("km_10");
+                    bg_10.style.backgroundColor = checkVal(pemupukan['status_10']).backgroundColor;
+                    km_10.textContent = pemupukan['status_10'];
+                    const bg_11 = document.getElementById("bg_11");
+                    const km_11 = document.getElementById("km_11");
+                    bg_11.style.backgroundColor = checkVal(pemupukan['status_11']).backgroundColor;
+                    km_11.textContent = pemupukan['status_11'];
+                    const bg_12 = document.getElementById("bg_12");
+                    const km_12 = document.getElementById("km_12");
+                    bg_12.style.backgroundColor = checkVal(pemupukan['status_12']).backgroundColor;
+                    km_12.textContent = pemupukan['status_12'];
+                    const bg_13 = document.getElementById("bg_13");
+                    const km_13 = document.getElementById("km_13");
+                    bg_13.style.backgroundColor = checkVal(pemupukan['status_13']).backgroundColor;
+                    km_13.textContent = pemupukan['status_13'];
+                    const bg_14 = document.getElementById("bg_14");
+                    const km_14 = document.getElementById("km_14");
+                    bg_14.style.backgroundColor = checkVal(pemupukan['status_14']).backgroundColor;
+                    km_14.textContent = pemupukan['status_14'];
+                    const bg_15 = document.getElementById("bg_15");
+                    const km_15 = document.getElementById("km_15");
+                    bg_15.style.backgroundColor = checkVal(pemupukan['status_15']).backgroundColor;
+                    km_15.textContent = pemupukan['status_15'];
+                    const bg_16 = document.getElementById("bg_16");
+                    const km_16 = document.getElementById("km_16");
+                    bg_16.style.backgroundColor = checkVal(pemupukan['status_16']).backgroundColor;
+                    km_16.textContent = pemupukan['status_16'];
+
+
+                    const th_ml = document.getElementsByClassName("tahun_mulai");
+                    const th_bl = document.getElementsByClassName("tahun_belum");
+                    const tahun_progres = document.getElementsByClassName("tahun_progres");
+                    const tahun_realisasi = document.getElementsByClassName("tahun_realisasi");
+
+                    // Loop through the elements and update their text content
+                    for (let i = 0; i < th_ml.length; i++) {
+                        th_ml[i].textContent = pemupukan['tahun_mulai'];
+                    }
+                    for (let i = 0; i < th_bl.length; i++) {
+                        th_bl[i].textContent = pemupukan['tahun_belum'];
+                    }
+                    for (let i = 0; i < tahun_progres.length; i++) {
+                        tahun_progres[i].textContent = pemupukan['tahun_progres'];
+                    }
+                    for (let i = 0; i < tahun_realisasi.length; i++) {
+                        tahun_realisasi[i].textContent = pemupukan['tahun_realisasi'];
+                    }
+
 
                     let type = requestData['dataType'];
 
@@ -989,11 +1612,54 @@
 
 
 
+                    var ktg_pk = plot['ktg_pk'];
+                    var ditangani_pk = plot['ditangani_pk'];
+                    var belum_pk = plot['belum_pk'];
+                    var jum_pokok = plot['jum_pokok'];
+
+                    // console.log(ktg_pk);
+                    chart.updateSeries([{
+                            name: 'Sudah Di tangani',
+                            data: ditangani_pk
+                        },
+                        {
+                            name: 'Belum Di tangani',
+                            data: belum_pk
+                        }
+                    ])
+
+                    chart.updateOptions({
+                        xaxis: {
+                            categories: ktg_pk
+                        },
+
+                    })
+
+                    // Assuming jum_pokok is an array of absolute values
+                    // Update the series data with the absolute values
+                    Dunut.updateSeries(jum_pokok);
+
+
+                    // Update the chart options
+                    Dunut.updateOptions({
+                        // You can change any option you want here
+                        chart: {
+                            // For example, you can change the width
+                            width: '80%',
+                        },
+                        labels: ktg_pk
+                    });
+
+
+
+
                 },
                 error: function(xhr, textStatus, errorThrown) {
                     console.error('AJAX error:', errorThrown);
                 }
             });
+
+
 
             // end ajax 
         });
