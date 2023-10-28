@@ -8,7 +8,7 @@
 
     <title>Dtracker Dashboard | SSMS</title>
     <!-- Favlogouticon -->
-    <link rel="shortcut icon" href="{{asset('img/logo-SSS.png')}}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{asset('img/CBI-logo.png')}}" type="image/x-icon">
     <!-- Custom styles -->
     <link rel="stylesheet" href="{{asset('elegant/css/style.min.css')}}">
 
@@ -27,23 +27,28 @@
 
             <div class="sidebar-start">
                 <div class="sidebar-head">
-                    <a href="{{ route('dashboard') }}" class="logo-wrapper" title="Home">
+                    <a href="{{ route('dashboard') }}" title="Home" style="text-align: center;">
                         <span class="sr-only">Home</span>
                         <!-- <span class="icon logo" aria-hidden="true"></span> -->
-                        <img src="{{ asset('img/logo-SSS.png') }}" style="height: 100%; width: 100%">
-                        <div class="logo-text">
+                        <img src="{{ asset('img/CBI-logo.png') }}" style="height: 60%; width: 70%">
+                        <!-- <div class="logo-text">
                             <span class="logo-title" style="font-size: 30px;">Welcome</span>
                             <span class="logo-subtitle" style="font-size: 20px;">Dashboard</span>
-                        </div>
+                        </div> -->
 
                     </a>
+
+                </div>
+                <div class="sidebar-head">
                     <button class="sidebar-toggle transparent-btn" title="Menu" type="button">
                         <span class="sr-only">Toggle menu</span>
                         <span class="icon menu-toggle" aria-hidden="true"></span>
                     </button>
+
                 </div>
 
                 <div class="sidebar-body">
+
                     <ul class="sidebar-body-menu">
                         <li>
                             <a class="active" href="{{ route('dashboard') }}"><span class="icon home" aria-hidden="true"></span>Dashboard</a>

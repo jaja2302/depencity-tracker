@@ -128,28 +128,29 @@
         <div class="col-lg-12">
             <div class="radio-group">
                 <!-- Radio button for "Regional" -->
-                <div style="display: inline-block; margin-right: 10px;">
+                <div style="display: inline-flex; align-items: center; margin-right: 10px;">
                     <input type="radio" id="regional" name="option" value="Regional">
-                    <label class="main-title" for="regional">Regional</label>
+                    <label class="main-title" for="regional" style="font-size: 25px; margin-left: -15px;">Regional</label>
                 </div>
+
                 <!-- Radio button for "Estate" -->
-                <div style="display: inline-block; margin-right: 10px;">
+                <div style="display: inline-flex; align-items: center; margin-right: 10px;">
                     <input type="radio" id="estate" name="option" value="Estate">
-                    <label class="main-title" for="estate">Estate</label>
+                    <label class="main-title" for="estate" style="font-size: 25px; margin-left: -15px;">Estate</label>
                 </div>
                 <!-- Radio button for "Afdeling" -->
-                <div style="display: inline-block; margin-right: 10px;">
+                <div style="display: inline-flex; align-items: center; margin-right: 10px;">
                     <input type="radio" id="afdeling" name="option" value="Afdeling">
-                    <label class="main-title" for="afdeling">Afdeling</label>
+                    <label class="main-title" for="afdeling" style="font-size: 25px; margin-left: -15px;">Afdeling</label>
                 </div>
                 <!-- Radio button for "Blok" -->
-                <div style="display: inline-block;">
+                <div style="display: inline-flex;align-items: center; ">
                     <input type="radio" id="blok" name="option" value="Blok">
-                    <label class="main-title" for="blok">Blok</label>
+                    <label class="main-title" for="blok" style="font-size: 25px; margin-left: -15px;">Blok</label>
                 </div>
                 <!-- "Show" button container -->
-                <div style="text-align: right;">
-                    <button id="btnShow" style="background-color: #007bff; color: white; border: none; padding: 10px 10px; border-radius: 5px;">Show</button>
+                <div style="display: inline-flex;align-items: center;text-align: right;">
+                    <button id="btnShow" style="background-color: #007bff; color: white; border: none; padding: 10px 10px; border-radius: 5px; margin-bottom: 9px;">Show</button>
                 </div>
 
             </div>
@@ -183,8 +184,38 @@
             </div>
         </div>
         <div class="col-lg-12">
+            <style>
+                .centered-container {
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+
+                }
+            </style>
+            <div class="centered-container" id="petachanges" style="display: none;margin-top: 10px;margin-bottom: 10px">
+                <!-- <p>Pilih Tampilan Peta:</p> -->
+                <form id="toggleForm">
+                    <div style="display: inline-flex;align-items: center; ">
+                        <input type="radio" name="view" value="cluster" style="display: inline-flex;align-items: center; " checked>
+                        <label class="main-title" for="blok" style="font-size: 10px; margin-left: -15px;margin-top:20px">Cluster</label>
+                    </div>
+                    <div style="display: inline-flex;align-items: center; ">
+                        <input type="radio" name="view" value="layergrup" style="display: inline-flex;align-items: center; ">
+                        <label class="main-title" for="blok" style="font-size: 10px; margin-left: -15px;margin-top:20px">All Markers</label>
+                    </div>
+
+
+                </form>
+            </div>
+
+
+
 
             <div id="map" style="height: 540px; z-index: 1;"></div>
+
+
 
         </div>
 
@@ -212,7 +243,7 @@
 
     <div class="row">
         <div class="col-lg-12">
-            <div class="top-cat-title">
+            <div class="top-cat-title" style="margin-top: -10px;">
                 <h3>Persentase </h3>
                 <p>Perlakuan Pokok Kuning</p>
             </div>
@@ -936,11 +967,65 @@
 
         map.addControl(new L.Control.Fullscreen());
 
-        var areaMapsLayer = L.layerGroup().addTo(map); // Create a layer group for area maps
-        var markersLayer = L.markerClusterGroup().addTo(map);
-        var markerBlok = L.markerClusterGroup().addTo(map);
+        var markersLayer;
+        var markerBlok;
 
-        map.addLayer(areaMapsLayer);
+        // Function to handle radio button change event
+        function handleRadioChange() {
+            var selectedValue = $("input[name='view']:checked").val();
+
+            if (selectedValue === 'cluster') {
+                if (markersLayer) {
+                    map.removeLayer(markersLayer);
+                }
+                if (markerBlok) {
+                    map.removeLayer(markerBlok);
+                }
+                markersLayer = L.markerClusterGroup().addTo(map);
+                markerBlok = L.markerClusterGroup().addTo(map);
+                $("#btnShow").click();
+            } else if (selectedValue === 'layergrup') {
+                // Add a SweetAlert confirmation
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Switching to layergrup may reduce performance.",
+                    icon: "warning",
+                    showCancelButton: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (markersLayer) {
+                            map.removeLayer(markersLayer);
+                        }
+                        if (markerBlok) {
+                            map.removeLayer(markerBlok);
+                        }
+                        markersLayer = L.layerGroup().addTo(map);
+                        markerBlok = L.layerGroup().addTo(map);
+                        $("#btnShow").click();
+                    } else {
+                        // User clicked "Cancel," so reset the radio button to 'cluster'
+                        $("input[name='view'][value='cluster']").prop("checked", true);
+                    }
+                });
+            }
+        }
+
+
+
+        // Attach the change event to the radio buttons
+        $("input[name='view']").change(handleRadioChange);
+
+        // Initially, based on the chosen value, set the map
+        var chose = $("input[name='view']:checked").val();
+        if (chose === 'cluster') {
+            markersLayer = L.markerClusterGroup().addTo(map);
+            markerBlok = L.markerClusterGroup().addTo(map);
+        } else if (chose === 'layergrup') {
+            markersLayer = L.layerGroup().addTo(map);
+            markerBlok = L.layerGroup().addTo(map);
+        }
+
+
 
         function drawPokok(pokok) {
             markersLayer.clearLayers(); // Clear markers layer only
@@ -1218,6 +1303,7 @@
 
             var container = document.getElementById("blok_pemupukan");
             var table_data = document.getElementById("table_data");
+            var petachanges = document.getElementById("petachanges");
 
             // Hide all filter options initially
             regionalOption.style.display = 'none';
@@ -1226,20 +1312,24 @@
             blokOption.style.display = 'none';
             container.style.display = 'none';
             table_data.style.display = 'none';
+            petachanges.style.display = 'none';
 
             // Show the selected filter option(s)
             if (option === 'Regional') {
                 regionalOption.style.display = 'block';
+                petachanges.style.display = 'block';
                 // table_data.style.display = 'block';
             } else if (option === 'Estate') {
                 regionalOption.style.display = 'block';
                 estateOption.style.display = 'block';
                 table_data.style.display = 'block';
+                petachanges.style.display = 'block';
             } else if (option === 'Afdeling') {
                 regionalOption.style.display = 'block';
                 estateOption.style.display = 'block';
                 afdelingOption.style.display = 'block';
                 table_data.style.display = 'block';
+                petachanges.style.display = 'block';
             } else if (option === 'Blok') {
                 regionalOption.style.display = 'block';
                 estateOption.style.display = 'block';
@@ -1247,6 +1337,7 @@
                 blokOption.style.display = 'block';
                 container.style.display = 'block';
                 table_data.style.display = 'block';
+                petachanges.style.display = 'block';
             } else {
                 // Handle any other cases or defaults here
             }
@@ -1657,7 +1748,11 @@
                         dom: 'Bfrtip',
                         buttons: ['excel', 'pdf', ],
                         columns: [{
-                                title: 'Estate',
+                                title: 'ID',
+                                data: 'id',
+                            },
+                            {
+                                title: 'Estate ',
                                 data: 'est',
                             },
                             {
@@ -1669,11 +1764,28 @@
                                 data: 'blok',
                             },
                             {
-                                title: 'Kondisi Pokok',
+                                title: 'Kondisi',
                                 data: 'kondisi',
-                            }, {
+                            },
+                            {
                                 title: 'Status Penanganan',
                                 data: 'status',
+                            },
+                            {
+                                title: 'Petugas',
+                                data: 'petugas',
+                            },
+                            {
+                                title: 'Datetime',
+                                data: 'datetime',
+                            },
+                            {
+                                title: 'Lat',
+                                data: 'lat',
+                            },
+                            {
+                                title: 'Lon',
+                                data: 'lon',
                             },
 
                         ],
