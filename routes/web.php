@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\TrackerController;
-
+use App\Http\Controllers\ValidateController;
 
 Route::get('/', [LoginController::class, 'index'])->name('index');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -16,4 +16,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/drawMaps', [TrackerController::class, 'drawMaps'])->name('drawMaps');
     Route::post('/updateUserqc', [TrackerController::class, 'updateUserqc'])->name('updateUserqc');
     Route::get('/getData', [TrackerController::class, 'getData'])->name('getData');
+    Route::get('/validateMaps', [ValidateController::class, 'mainMaps'])->name('mainMaps');
+    Route::get('/getOptValidateEst/{id}', [ValidateController::class, 'getOptValidateEst'])->name('getOptValidateEst');
+    Route::get('/getOptValidateAfd/{id}', [ValidateController::class, 'getOptValidateAfd'])->name('getOptValidateAfd');
+    Route::get('/getCoordinatesValidate/{est}', [ValidateController::class, 'getCoordinatesValidate'])->name('getCoordinatesValidate');
+    Route::post('/processValidate', [ValidateController::class, 'processValidate'])->name('processValidate');
 });
