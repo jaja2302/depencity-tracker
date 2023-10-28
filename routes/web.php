@@ -17,7 +17,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/updateUserqc', [TrackerController::class, 'updateUserqc'])->name('updateUserqc');
     Route::get('/getData', [TrackerController::class, 'getData'])->name('getData');
     Route::get('/validateMaps', [ValidateController::class, 'mainMaps'])->name('mainMaps');
-    Route::get('/getOptValidate/{id}', [ValidateController::class, 'getOptValidate'])->name('getOptValidate');
+    Route::get('/getOptValidateEst/{id}', [ValidateController::class, 'getOptValidateEst'])->name('getOptValidateEst');
+    Route::get('/getOptValidateAfd/{id}', [ValidateController::class, 'getOptValidateAfd'])->name('getOptValidateAfd');
     Route::get('/getCoordinatesValidate/{est}', [ValidateController::class, 'getCoordinatesValidate'])->name('getCoordinatesValidate');
     Route::post('/processValidate', [ValidateController::class, 'processValidate'])->name('processValidate');
 });

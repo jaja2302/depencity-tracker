@@ -25,7 +25,7 @@ class ValidateController extends Controller
         return view('Validate.dashboard', compact('regArrSelected'));
     }
 
-    public function getOptValidate($id) {
+    public function getOptValidateEst($id) {
         $selectWil = DB::connection('mysql2')->table('wil')
             ->select('wil.*')
             ->where('regional', $id)
@@ -40,6 +40,22 @@ class ValidateController extends Controller
         $selectEst = json_decode($selectEst, true);
 
         return response()->json($selectEst);
+    }
+
+    public function getOptValidateAfd($id) {
+        $selectEst = DB::connection('mysql2')->table('estate')
+            ->select('estate.*')
+            ->where('est', $id)
+            ->pluck('id');
+        $selectEst = json_decode($selectEst, true);
+
+        $selectAfd = DB::connection('mysql2')->table('afdeling')
+            ->select('afdeling.*')
+            ->whereIn('estate', $selectEst)
+            ->pluck('nama');
+        $selectAfd = json_decode($selectAfd, true);
+
+        return response()->json($selectAfd);
     }
 
     public function getCoordinatesValidate($est) {
@@ -110,6 +126,7 @@ class ValidateController extends Controller
 
         $pkLatLn = array();
         foreach ($dtQuery as $key => $value) {
+            $pkLatLn[$value['id']]['afd'] = $value['afd'];
             $pkLatLn[$value['id']]['blok'] = $value['blok'];
             $pkLatLn[$value['id']]['latln'] = $value['lat'] . ', ' . $value['lon'];
         }

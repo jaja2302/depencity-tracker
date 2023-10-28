@@ -48,6 +48,11 @@
                         <li>
                             <a class="active" href="{{ route('dashboard') }}"><span class="icon home" aria-hidden="true"></span>Dashboard</a>
                         </li>
+                        @if(session('jabatan') == 'Admin')
+                        <li>
+                            <a href="{{ route('mainMaps') }}"><span class="icon paper" aria-hidden="true"></span>Sinkronisasi Maps</a>
+                        </li>
+                        @endif
                         <li>
 
                             <ul class="cat-sub-menu">

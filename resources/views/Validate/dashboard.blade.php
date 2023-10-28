@@ -65,27 +65,38 @@
 
 <div class="container">
     <div class="row stat-cards-item">
-        <div class="col-lg-12" style="margin-bottom: 0.5%;">
-            <label class="main-title" style="font-size: 18px; margin-right: 20px;">Pilih Regional</label>
-            <label class="main-title" style="font-size: 18px;">:</label>
-            <select class="form-control" id="regOptions">
-                <option value="" selected disabled>Pilih Regional</option>
-                @foreach ($regArrSelected as $option)
-                <option value="{{ $option['id'] }}">{{ $option['nama'] }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-lg-12" style="margin-bottom: 1%;">
-            <label class="main-title" style="font-size: 18px; margin-right: 40px;">Pilih Estate</label>
-            <label class="main-title" style="font-size: 18px;">:</label>
-            <select class="form-control" id="estOptions"></select>
-        </div>
-        <div class="col-lg-12" style="margin-bottom: 1%;">
-            <button class="btn btn-primary mb-3 ml-3" id="showMaps">Show</button>
-        </div>
-        <div class="col-lg-12">
-            <div id="map" style="height: 700px; z-index: 1;"></div>
-        </div>
+        @if(session('jabatan') == 'Admin')
+            <div class="col-lg-12" style="margin-bottom: 0.5%;">
+                <label class="main-title" style="font-size: 18px; margin-right: 20px;">Pilih Regional</label>
+                <label class="main-title" style="font-size: 18px;">:</label>
+                <select class="form-control" id="regOptions">
+                    <option value="" selected disabled>Pilih Regional</option>
+                    @foreach ($regArrSelected as $option)
+                    <option value="{{ $option['id'] }}">{{ $option['nama'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-lg-12" style="margin-bottom: 1%;">
+                <label class="main-title" style="font-size: 18px; margin-right: 40px;">Pilih Estate</label>
+                <label class="main-title" style="font-size: 18px;">:</label>
+                <select class="form-control" id="estOptions"></select>
+            </div>
+            <div class="col-lg-12" style="margin-bottom: 1%;">
+                <label class="main-title" style="font-size: 18px; margin-right: 22px;">Pilih Afdeling</label>
+                <label class="main-title" style="font-size: 18px;">:</label>
+                <select class="form-control" id="afdOptions"></select>
+            </div>
+            <div class="col-lg-12" style="margin-bottom: 1%;">
+                <button class="btn btn-primary mb-3 ml-3" id="showMaps">Show</button>
+            </div>
+            <div class="col-lg-12">
+                <div id="map" style="height: 700px; z-index: 1;"></div>
+            </div>
+        @else 
+            <div class="col-lg-12" style="margin-bottom: 0.5%;">
+                <h3>Tidak dapat mengakses halaman ini!</h3>
+            </div>
+        @endif
     </div>
 </div>
 
@@ -202,6 +213,7 @@
 
         var select1 = $('#regOptions');
         var select2 = $('#estOptions');
+        var select3 = $('#afdOptions');
 
         var optDefault = $('<option>', {
             value: '',
@@ -211,10 +223,18 @@
         });
         select2.append(optDefault);
 
+        var optDefault1 = $('<option>', {
+            value: '',
+            text: 'Pilih Afdeling',
+            selected: true,
+            disabled: true
+        });
+        select3.append(optDefault1);
+
         select1.change(function () {
             var selectedOption = select1.val();
             if (selectedOption) {
-                $.get('/getOptValidate/' + selectedOption, function (data) {
+                $.get('/getOptValidateEst/' + selectedOption, function (data) {
                     select2.empty();
                     select2.append(optDefault);
                     $.each(data, function (key, value) {
@@ -228,9 +248,26 @@
         });
 
         select2.change(function () {
+            var selectedOptAfd = select2.val();
+            if (selectedOptAfd) {
+                $.get('/getOptValidateAfd/' + selectedOptAfd, function (data) {
+                    select3.empty();
+                    select3.append(optDefault1);
+                    $.each(data, function (key, value) {
+                        select3.append($('<option></option>').attr('value', value).text(
+                            value));
+                    });
+                });
+            } else {
+                select3.empty();
+            }
+        });
+
+        select3.change(function () {
             geoJSONArray = []
             markersPk = []
             var selectedEst = select2.val();
+            var selectedAfd = select3.val();
 
             $.get('/getCoordinatesValidate/' + selectedEst, function (data) {
                 var data1 = data.data1;
@@ -239,30 +276,32 @@
                 for (let category in data1) {
                     for (let key in data1[category]) {
                         if (data1[category][key].hasOwnProperty('latln')) {
-                            var coordinatesString = data1[category][key]['latln']
-                            var coordinatePairs = coordinatesString.split("$");
-                            var coordinatesArray = [];
-                            for (var i = 0; i < coordinatePairs.length; i++) {
-                                var pair = coordinatePairs[i].trim();
-                                var coordinateArray = JSON.parse(pair);
-                                coordinatesArray.push(coordinateArray);
-                            }
-                            var formattedArray = [coordinatesArray];
-
-                            var geoJSONString = JSON.stringify({
-                                "type": "Feature",
-                                "properties": {
-                                    "afdeling": category,
-                                    "blok": key
-                                },
-                                "geometry": {
-                                    "type": "Polygon",
-                                    "coordinates": formattedArray
+                            if (category == selectedAfd) {
+                                var coordinatesString = data1[category][key]['latln']
+                                var coordinatePairs = coordinatesString.split("$");
+                                var coordinatesArray = [];
+                                for (var i = 0; i < coordinatePairs.length; i++) {
+                                    var pair = coordinatePairs[i].trim();
+                                    var coordinateArray = JSON.parse(pair);
+                                    coordinatesArray.push(coordinateArray);
                                 }
-                            });
+                                var formattedArray = [coordinatesArray];
 
-                            var geoJSONObject = JSON.parse(geoJSONString);
-                            geoJSONArray.push(geoJSONObject);
+                                var geoJSONString = JSON.stringify({
+                                    "type": "Feature",
+                                    "properties": {
+                                        "afdeling": category,
+                                        "blok": key
+                                    },
+                                    "geometry": {
+                                        "type": "Polygon",
+                                        "coordinates": formattedArray
+                                    }
+                                });
+
+                                var geoJSONObject = JSON.parse(geoJSONString);
+                                geoJSONArray.push(geoJSONObject);
+                            }
                         }
                     }
                 }
@@ -270,12 +309,14 @@
                 for (var id in data2) {
                     if (data2.hasOwnProperty(id)) {
                         var item = data2[id];
-                        var latlng = item.latln.split(',').map(parseFloat);
-                        markersPk.push({
-                            id: parseInt(id),
-                            blok: item.blok,
-                            latlng: latlng
-                        });
+                        if (item.afd == selectedAfd) {
+                            var latlng = item.latln.split(',').map(parseFloat);
+                            markersPk.push({
+                                id: parseInt(id),
+                                blok: item.blok,
+                                latlng: latlng
+                            });
+                        }
                     }
                 }
             });
@@ -283,172 +324,187 @@
     });
 
     $('#showMaps').click(function () {
-        estateLayerGroup.clearLayers();
-        markerGroup.clearLayers();
+        const regOptions = document.getElementById('regOptions');
+        const estOptions = document.getElementById('estOptions');
+        const afdOptions = document.getElementById('afdOptions');
 
-        for (i = 0; i < titleBlok.length; i++) {
-            map.removeLayer(titleBlok[i]);
-        }
-
-        if (map === null) {
-            map = initializeMap();
+        if (regOptions.value === '' || estOptions.value === '' || afdOptions.value === '') {
+            Swal.fire({
+                title: 'Peringatan',
+                text: 'Silakan masukkan regional/estate/afdeling',
+                icon: 'warning',
+            });
         } else {
-            map.invalidateSize();
-        }
+            estateLayerGroup.clearLayers();
+            markerGroup.clearLayers();
 
-        var estateObj = L.geoJSON(geoJSONArray, {
-            style: function (feature) {
-                switch (feature.properties.afdeling) {
-                    case 'OA':
-                        return {
-                            color: "#f39c12"
-                        };
-                    case 'OB':
-                        return {
-                            color: "#f9e79f"
-                        };
-                    case 'OC':
-                        return {
-                            color: "#abebc6"
-                        };
-                    case 'OD':
-                        return {
-                            color: "#d98880"
-                        };
-                    case 'OE':
-                        return {
-                            color: "#a9cce3"
-                        };
-                    case 'OF':
-                        return {
-                            color: "#d2b4de"
-                        };
-                }
-            },
-            onEachFeature: function (feature, layer) {
-                var label = L.marker(layer.getBounds().getCenter(), {
-                    icon: L.divIcon({
-                        className: 'label-blok',
-                        html: feature.properties.blok,
-                        iconSize: [100, 20]
-                    })
-                }).addTo(map);
-                titleBlok.push(label)
+            for (i = 0; i < titleBlok.length; i++) {
+                map.removeLayer(titleBlok[i]);
             }
-        }).addTo(map);
 
-        estateLayerGroup.addLayer(estateObj);
-        estateLayerGroup.addTo(map);
-
-        map.fitBounds(estateObj.getBounds());
-
-        markersPk.forEach(function (marker) {
-            L.marker(marker.latlng)
-                .addTo(markerGroup)
-                .bindPopup('ID: ' + marker.id + '<br>Blok: ' + marker.blok);
-        });
-        markerGroup.addTo(map)
-
-        estateObj.on('click', function (e) {
-            var clickedPolygon = e.layer;
-
-            var category = clickedPolygon.feature.properties.afdeling;
-            var key = clickedPolygon.feature.properties.blok;
-
-            var markersInsidePolygon = markersPk.filter(function (marker) {
-                return clickedPolygon.getBounds().contains(L.latLng(marker.latlng));
-            });
-
-            var markerIdsInsidePolygon = markersInsidePolygon.map(function (marker) {
-                return marker.id;
-            });
-
-            console.log("Polygon Estate:", $('#estOptions').val());
-            console.log("Polygon Afdeling:", category);
-            console.log("Polygon Blok:", key);
-            console.log("Markers inside the polygon:", markerIdsInsidePolygon);
-
-            if (markerIdsInsidePolygon.length === 0) {
-                Swal.fire({
-                    title: 'Peringatan',
-                    text: 'Tidak ada data pokok kuning!',
-                    icon: 'warning',
-                });
+            if (map === null) {
+                map = initializeMap();
             } else {
-                var csrfToken = $('input[name="_token"]').val();
-                Swal.fire({
-                    title: '<h3>Validasi Data</h3>',
-                    html: '<div class="swal2-input-container">' +
-                        '<div class="swal2-input-col">' +
-                        '<p>Total pokok di ' + key + ' : ' + markerIdsInsidePolygon.length +
-                        '</p>' +
-                        '</div><div class="swal2-input-col">' +
-                        '<input id="inputAfdeling" class="swal2-input" placeholder="Masukkan nama afdeling" value="' +
-                        category + '">' +
-                        '</div>' +
-                        '<div class="swal2-input-col">' +
-                        '<input id="inputBlok" class="swal2-input" placeholder="Masukkan nama blok" value="' +
-                        key + '">' +
-                        '</div>' +
-                        '</div>',
-                    showCancelButton: true,
-                    confirmButtonText: 'Submit',
-                    cancelButtonText: 'Cancel',
-                    preConfirm: () => {
-                        const valAfd = document.getElementById('inputAfdeling').value;
-                        const valBlok = document.getElementById('inputBlok').value;
-
-                        Swal.fire({
-                            title: 'Validasi Data',
-                            text: 'Yakin ingin memperbarui data?',
-                            showCancelButton: true,
-                            confirmButtonText: 'Confirm',
-                            cancelButtonText: 'Cancel',
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                $.ajax({
-                                    type: 'POST',
-                                    url: '/processValidate',
-                                    data: {
-                                        rilAfd: category,
-                                        rilBlok: key,
-                                        inpAfd: valAfd,
-                                        inpBlok: valBlok,
-                                        markerIds: markerIdsInsidePolygon
-                                    },
-                                    headers: {
-                                        'X-CSRF-TOKEN': csrfToken
-                                    },
-                                    success: function (response) {
-                                        Swal.fire({
-                                            title: 'Success',
-                                            text: response
-                                                .message,
-                                            icon: 'success',
-                                        }).then((result) => {
-                                            if (result
-                                                .isConfirmed) {
-                                                const routeUrl =
-                                                    "{{ route('mainMaps') }}";
-                                                window.location
-                                                    .href =
-                                                    routeUrl
-                                            }
-                                        });
-                                    },
-                                    error: function (error) {
-                                        Swal.fire({
-                                            title: 'Error',
-                                            text: 'Gagal memperbarui data!',
-                                            icon: 'error',
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                    },
-                });
+                map.invalidateSize();
             }
-        });
+
+            var estateObj = L.geoJSON(geoJSONArray, {
+                style: function (feature) {
+                    switch (feature.properties.afdeling) {
+                        case 'OA':
+                            return {
+                                color: "#f39c12"
+                            };
+                        case 'OB':
+                            return {
+                                color: "#f9e79f"
+                            };
+                        case 'OC':
+                            return {
+                                color: "#abebc6"
+                            };
+                        case 'OD':
+                            return {
+                                color: "#d98880"
+                            };
+                        case 'OE':
+                            return {
+                                color: "#a9cce3"
+                            };
+                        case 'OF':
+                            return {
+                                color: "#d2b4de"
+                            };
+                    }
+                },
+                onEachFeature: function (feature, layer) {
+                    var label = L.marker(layer.getBounds().getCenter(), {
+                        icon: L.divIcon({
+                            className: 'label-blok',
+                            html: feature.properties.blok,
+                            iconSize: [100, 20]
+                        })
+                    }).addTo(map);
+                    titleBlok.push(label)
+                }
+            }).addTo(map);
+
+            estateLayerGroup.addLayer(estateObj);
+            estateLayerGroup.addTo(map);
+
+            map.fitBounds(estateObj.getBounds());
+
+            markersPk.forEach(function (marker) {
+                L.marker(marker.latlng)
+                    .addTo(markerGroup)
+                    .bindPopup('ID: ' + marker.id + '<br>Blok: ' + marker.blok);
+            });
+            markerGroup.addTo(map)
+
+            estateObj.on('click', function (e) {
+                var clickedPolygon = e.layer;
+
+                var category = clickedPolygon.feature.properties.afdeling;
+                var key = clickedPolygon.feature.properties.blok;
+
+                var markersInsidePolygon = markersPk.filter(function (marker) {
+                    return clickedPolygon.getBounds().contains(L.latLng(marker.latlng));
+                });
+
+                var markerIdsInsidePolygon = markersInsidePolygon.map(function (marker) {
+                    return marker.id;
+                });
+
+                console.log("Polygon Estate:", $('#estOptions').val());
+                console.log("Polygon Afdeling:", category);
+                console.log("Polygon Blok:", key);
+                console.log("Markers inside the polygon:", markerIdsInsidePolygon);
+
+                if (markerIdsInsidePolygon.length === 0) {
+                    Swal.fire({
+                        title: 'Peringatan',
+                        text: 'Tidak ada data pokok kuning!',
+                        icon: 'warning',
+                    });
+                } else {
+                    var csrfToken = $('input[name="_token"]').val();
+                    Swal.fire({
+                        title: '<h3>Validasi Data</h3>',
+                        html: '<div class="swal2-input-container">' +
+                            '<div class="swal2-input-col">' +
+                            '<p>Total pokok di ' + key + ' : ' + markerIdsInsidePolygon.length +
+                            '</p>' +
+                            '</div><div class="swal2-input-col">' +
+                            '<input id="inputAfdeling" class="swal2-input" placeholder="Masukkan nama afdeling" value="' +
+                            category + '">' +
+                            '</div>' +
+                            '<div class="swal2-input-col">' +
+                            '<input id="inputBlok" class="swal2-input" placeholder="Masukkan nama blok" value="' +
+                            key + '">' +
+                            '</div>' +
+                            '</div>',
+                        showCancelButton: true,
+                        confirmButtonText: 'Submit',
+                        cancelButtonText: 'Cancel',
+                        preConfirm: () => {
+                            const valAfd = document.getElementById('inputAfdeling').value;
+                            const valBlok = document.getElementById('inputBlok').value;
+
+                            Swal.fire({
+                                title: 'Validasi Data',
+                                text: 'Yakin ingin memperbarui data?',
+                                showCancelButton: true,
+                                confirmButtonText: 'Confirm',
+                                cancelButtonText: 'Cancel',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: '/processValidate',
+                                        data: {
+                                            rilAfd: category,
+                                            rilBlok: key,
+                                            inpAfd: valAfd,
+                                            inpBlok: valBlok,
+                                            markerIds: markerIdsInsidePolygon
+                                        },
+                                        headers: {
+                                            'X-CSRF-TOKEN': csrfToken
+                                        },
+                                        success: function (response) {
+                                            Swal.fire({
+                                                title: 'Success',
+                                                text: response
+                                                    .message,
+                                                icon: 'success',
+                                            }).then((result) => {
+                                                if (result
+                                                    .isConfirmed
+                                                    ) {
+                                                    const
+                                                        routeUrl =
+                                                        "{{ route('mainMaps') }}";
+                                                    window
+                                                        .location
+                                                        .href =
+                                                        routeUrl
+                                                }
+                                            });
+                                        },
+                                        error: function (error) {
+                                            Swal.fire({
+                                                title: 'Error',
+                                                text: 'Gagal memperbarui data!',
+                                                icon: 'error',
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        },
+                    });
+                }
+            });
+        }
     });
 </script>
