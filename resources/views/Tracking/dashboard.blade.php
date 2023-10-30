@@ -66,42 +66,41 @@
     <br>
 
     <div class="row stat-cards">
-        <div class="col-md-6 col-xl-4">
+        <div class="col-md-3 col-xl-3">
             <article class="stat-cards-item">
                 <div class="stat-cards-icon primary">
-                    <img src="{{ asset('img/pokok_kuning.png') }}" alt="Custom Icon">
+                    <img src="{{ asset('img/pokokkuning.png') }}" alt="Custom Icon">
                 </div>
-
                 <div class="stat-cards-info">
-                    <p class="stat-cards-info__num" id="total_pk"></p>
+                    <p class="stat-cards-info__num" id="total_pkkuning"></p>
                     <p class="stat-cards-info__title">Total Pokok Kuning</p>
-                    <!-- <p class="stat-cards-info__progress">
-                        <span class="stat-cards-info__profit success">
-                            <i data-feather="trending-up" aria-hidden="true"></i>4.07%
-                        </span>
-                        Last month
-                    </p> -->
                 </div>
             </article>
         </div>
-        <div class="col-md-6 col-xl-4">
+        <div class="col-md-3 col-xl-3">
             <article class="stat-cards-item">
                 <div class="stat-cards-icon primary">
-                    <img src="{{ asset('img/pokok_sembuh.png') }}" alt="Custom Icon">
+                    <img src="{{ asset('img/belumtangan.png') }}" alt="Custom Icon">
+                </div>
+                <div class="stat-cards-info">
+                    <p class="stat-cards-info__num" id="total_pk"></p>
+                    <p class="stat-cards-info__title">Total Belum Ditangani</p>
+                </div>
+            </article>
+        </div>
+        <div class="col-md-3 col-xl-3">
+            <article class="stat-cards-item">
+                <div class="stat-cards-icon primary">
+                    <img src="{{ asset('img/sembuh.png') }}" alt="Custom Icon">
                 </div>
                 <div class="stat-cards-info">
                     <p class="stat-cards-info__num" id="sembuh_pk"></p>
                     <p class="stat-cards-info__title">Total Sembuh</p>
-                    <!-- <p class="stat-cards-info__progress">
-                        <span class="stat-cards-info__profit success">
-                            <i data-feather="trending-up" aria-hidden="true"></i>0.24%
-                        </span>
-                        Last month
-                    </p> -->
+
                 </div>
             </article>
         </div>
-        <div class="col-md-6 col-xl-4">
+        <div class="col-md-3 col-xl-3">
             <article class="stat-cards-item">
                 <div class="stat-cards-icon primary">
                     <img src="{{ asset('img/percens.png') }}" alt="Custom Icon">
@@ -109,12 +108,6 @@
                 <div class="stat-cards-info">
                     <p class="stat-cards-info__num" id="persen_pk"></p>
                     <p class="stat-cards-info__title">Progress</p>
-                    <!-- <p class="stat-cards-info__progress">
-                        <span class="stat-cards-info__profit danger">
-                            <i data-feather="trending-down" aria-hidden="true"></i>1.64%
-                        </span>
-                        Last month
-                    </p> -->
                 </div>
             </article>
         </div>
@@ -1424,7 +1417,16 @@
                     // console.log(totalx);
 
                     const totalPkElement = document.getElementById("total_pk");
+                    const total_pkkuning = document.getElementById("total_pkkuning");
 
+
+
+
+                    if (total_pkkuning) {
+                        total_pkkuning.textContent = parseInt(totalx) + parseInt(total_ditangani);
+                    } else {
+                        console.error("Element with id 'total_pk' not found.");
+                    }
                     if (totalPkElement) {
                         totalPkElement.textContent = totalx;
                     } else {
