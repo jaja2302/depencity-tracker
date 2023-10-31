@@ -50,7 +50,7 @@
                         </li>
                         @if(session('jabatan') == 'Admin')
                         <li>
-                            <a href="{{ route('mainMaps') }}"><span class="icon paper" aria-hidden="true"></span>Sinkronisasi Maps</a>
+                            <a href="{{ route('sinkronMaps') }}"><span class="icon paper" aria-hidden="true"></span>Sinkronisasi Maps</a>
                         </li>
                         @endif
                         <li>
