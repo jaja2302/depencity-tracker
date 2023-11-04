@@ -9,34 +9,38 @@ class ValidateController extends Controller
 {
     public function processSynchronize(Request $request)
     {
-        function isPointInPolygon($point, $polygon) {
+        function isPointInPolygon($point, $polygon)
+        {
             $splPoint = explode(',', $point);
             $x = $splPoint[0];
             $y = $splPoint[1];
-            
-            $vertices = array_map(function($vertex) {
+
+            $vertices = array_map(function ($vertex) {
                 return explode(',', $vertex);
             }, explode('$', $polygon));
-            
+
             $numVertices = count($vertices);
             $isInside = false;
-            
+
             for ($i = 0, $j = $numVertices - 1; $i < $numVertices; $j = $i++) {
                 $xi = $vertices[$i][0];
                 $yi = $vertices[$i][1];
                 $xj = $vertices[$j][0];
                 $yj = $vertices[$j][1];
-                
-                $intersect = (($yi > $y) != ($yj > $y)) && ($x < ($xj - $xi) * ($y - $yi) / ($yj - $yi) + $xi);
-                
-                if ($intersect) {
+
+                if (($yi < $y && $yj >= $y || $yj < $y && $yi >= $y) && ($xi + ($y - $yi) / ($yj - $yi) * ($xj - $xi) < $x)) {
                     $isInside = !$isInside;
                 }
             }
-            
+
             return $isInside;
         }
-        
+
+        $polygon = "-2.265517895,111.6618414$-2.268859042,111.6617089$-2.268085126,111.6525868$-2.265298213,111.6526788$-2.265517895,111.6618414";
+        $point = "-2.26664281015,111.654028622";
+        $test = isPointInPolygon($point, $polygon);
+        dd($test);
+
         $reg = $request->input('regVal');
         $est = $request->input('estVal');
 
@@ -46,7 +50,7 @@ class ValidateController extends Controller
             ->where('estate.est', $est)
             ->get();
         $estateQuery = json_decode($estateQuery, true);
-        
+
         $listIdAfd = array();
         foreach ($estateQuery as $key => $value) {
             $listIdAfd[] = $value['id'];
@@ -117,6 +121,9 @@ class ValidateController extends Controller
             $incr++;
         }
 
+        // dd($blokLatLn, $pkLatLn);
+
+
         $messageResponse = [];
         foreach ($blokLatLn as $value) {
             foreach ($pkLatLn as $marker) {
@@ -138,10 +145,10 @@ class ValidateController extends Controller
             'message' => 'Berhasil sinkronisasi data!',
             'data' => $messageResponse
         ];
-        
+
         return response()->json($response);
     }
-    
+
     public function sinkronMaps()
     {
         $selectReg = DB::connection('mysql2')->table('reg')
@@ -178,7 +185,8 @@ class ValidateController extends Controller
         return view('Validate.dashboard', compact('regArrSelected'));
     }
 
-    public function getOptValidateEst($id) {
+    public function getOptValidateEst($id)
+    {
         $selectWil = DB::connection('mysql2')->table('wil')
             ->select('wil.*')
             ->where('regional', $id)
@@ -195,7 +203,8 @@ class ValidateController extends Controller
         return response()->json($selectEst);
     }
 
-    public function getOptValidateAfd($id) {
+    public function getOptValidateAfd($id)
+    {
         $selectEst = DB::connection('mysql2')->table('estate')
             ->select('estate.*')
             ->where('est', $id)
@@ -211,14 +220,15 @@ class ValidateController extends Controller
         return response()->json($selectAfd);
     }
 
-    public function getCoordinatesValidate($est) {
+    public function getCoordinatesValidate($est)
+    {
         $estateQuery = DB::connection('mysql2')->table('estate')
             ->select('*')
             ->join('afdeling', 'afdeling.estate', '=', 'estate.id')
             ->where('estate.est', $est)
             ->get();
         $estateQuery = json_decode($estateQuery, true);
-        
+
         $listIdAfd = array();
         foreach ($estateQuery as $key => $value) {
             $listIdAfd[] = $value['id'];
@@ -292,7 +302,8 @@ class ValidateController extends Controller
         return response()->json($response);
     }
 
-    public function processValidate(Request $request) {
+    public function processValidate(Request $request)
+    {
         $rilAfd = $request->input('rilAfd');
         $rilBlok = $request->input('rilBlok');
         $inpAfd = $request->input('inpAfd');
@@ -300,12 +311,12 @@ class ValidateController extends Controller
         $markerIds = $request->input('markerIds');
 
         $queryUpdate = DB::connection('mysql2')->table('deficiency_tracker')
-        ->whereIn('id', $markerIds)
-        ->update([
-            'afd' => $inpAfd,
-            'blok' => $inpBlok
-        ]);
-    
+            ->whereIn('id', $markerIds)
+            ->update([
+                'afd' => $inpAfd,
+                'blok' => $inpBlok
+            ]);
+
         if ($queryUpdate > 0) {
             return response()->json(['message' => 'Berhasil memperbarui data!']);
         } else {

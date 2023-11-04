@@ -23,5 +23,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/processValidate', [ValidateController::class, 'processValidate'])->name('processValidate');
 
     Route::get('/sinkronMaps', [ValidateController::class, 'sinkronMaps'])->name('sinkronMaps');
-    Route::post('/processSynchronize', [ValidateController::class, 'processSynchronize'])->name('processSynchronize');
+    Route::get('/processSynchronize', [ValidateController::class, 'processSynchronize'])->name('processSynchronize');
 });

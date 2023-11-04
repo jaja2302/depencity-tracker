@@ -169,8 +169,7 @@
     }
 </style>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -178,8 +177,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
 <script type="text/javascript" src="{{ asset('js/Leaflet.Editable.js') }}"></script>
 <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
-<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css'
-    rel='stylesheet' />
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- Leaflet.draw CSS -->
@@ -189,24 +187,18 @@
 <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" />
-<link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
-<link
-    href="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/datatables.min.css"
-    rel="stylesheet">
+<link href="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/datatables.min.css" rel="stylesheet">
 
 
-<link
-    href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/cr-1.7.0/date-1.5.1/fc-4.3.0/r-2.5.0/rr-1.4.1/sc-2.2.0/sb-1.6.0/sp-2.2.0/datatables.min.css"
-    rel="stylesheet">
+<link href="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/cr-1.7.0/date-1.5.1/fc-4.3.0/r-2.5.0/rr-1.4.1/sc-2.2.0/sb-1.6.0/sp-2.2.0/datatables.min.css" rel="stylesheet">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-<script
-    src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/cr-1.7.0/date-1.5.1/fc-4.3.0/r-2.5.0/rr-1.4.1/sc-2.2.0/sb-1.6.0/sp-2.2.0/datatables.min.js">
+<script src="https://cdn.datatables.net/v/bs5/jszip-3.10.1/dt-1.13.6/b-2.4.2/b-html5-2.4.2/b-print-2.4.2/cr-1.7.0/date-1.5.1/fc-4.3.0/r-2.5.0/rr-1.4.1/sc-2.2.0/sb-1.6.0/sp-2.2.0/datatables.min.js">
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js">
 </script>
@@ -216,7 +208,7 @@
 @include('Layout.footer')
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function() {
         var select1 = $('#regOptions');
         var select2 = $('#estOptions');
 
@@ -228,13 +220,13 @@
         });
         select2.append(optDefault);
 
-        select1.change(function () {
+        select1.change(function() {
             var selectedOption = select1.val();
             if (selectedOption) {
-                $.get('/getOptValidateEst/' + selectedOption, function (data) {
+                $.get('/getOptValidateEst/' + selectedOption, function(data) {
                     select2.empty();
                     select2.append(optDefault);
-                    $.each(data, function (key, value) {
+                    $.each(data, function(key, value) {
                         select2.append($('<option></option>').attr('value', value).text(
                             value));
                     });
@@ -245,7 +237,7 @@
         });
     });
 
-    $('#syncButton').click(function () {
+    $('#syncButton').click(function() {
         const regOptions = document.getElementById('regOptions');
         const estOptions = document.getElementById('estOptions');
 
@@ -276,7 +268,7 @@
 
                     var csrfToken = $('input[name="_token"]').val();
                     $.ajax({
-                        type: 'POST',
+                        type: 'GET',
                         url: '/processSynchronize',
                         data: {
                             regVal: regOptions.value,
@@ -285,7 +277,7 @@
                         headers: {
                             'X-CSRF-TOKEN': csrfToken
                         },
-                        success: function (response) {
+                        success: function(response) {
                             Swal.close()
                             Swal.fire({
                                 title: 'Success',
@@ -311,7 +303,7 @@
                                 console.log(message)
                             });
                         },
-                        error: function (error) {
+                        error: function(error) {
                             Swal.close()
                             Swal.fire({
                                 title: 'Error',
