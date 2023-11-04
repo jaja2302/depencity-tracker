@@ -7,6 +7,159 @@ use Illuminate\Support\Facades\DB;
 
 class ValidateController extends Controller
 {
+    public function processSynchronize(Request $request)
+    {
+        function isPointInPolygon($point, $polygon) {
+            $splPoint = explode(',', $point);
+            $x = $splPoint[0];
+            $y = $splPoint[1];
+            
+            $vertices = array_map(function($vertex) {
+                return explode(',', $vertex);
+            }, explode('$', $polygon));
+            
+            $numVertices = count($vertices);
+            $isInside = false;
+            
+            for ($i = 0, $j = $numVertices - 1; $i < $numVertices; $j = $i++) {
+                $xi = $vertices[$i][0];
+                $yi = $vertices[$i][1];
+                $xj = $vertices[$j][0];
+                $yj = $vertices[$j][1];
+                
+                $intersect = (($yi > $y) != ($yj > $y)) && ($x < ($xj - $xi) * ($y - $yi) / ($yj - $yi) + $xi);
+                
+                if ($intersect) {
+                    $isInside = !$isInside;
+                }
+            }
+            
+            return $isInside;
+        }
+        
+        $reg = $request->input('regVal');
+        $est = $request->input('estVal');
+
+        $estateQuery = DB::connection('mysql2')->table('estate')
+            ->select('*')
+            ->join('afdeling', 'afdeling.estate', '=', 'estate.id')
+            ->where('estate.est', $est)
+            ->get();
+        $estateQuery = json_decode($estateQuery, true);
+        
+        $listIdAfd = array();
+        foreach ($estateQuery as $key => $value) {
+            $listIdAfd[] = $value['id'];
+        }
+
+        $blokEstate = DB::connection('mysql2')->table('blok')
+            ->select(DB::raw('DISTINCT nama, MIN(id) as id, afdeling'))
+            ->whereIn('afdeling', $listIdAfd)
+            ->groupBy('nama', 'afdeling')
+            ->get();
+        $blokEstate = json_decode($blokEstate, true);
+
+        $blokEstateFix = array();
+        foreach ($blokEstate as $key => $value) {
+            $blokEstateFix[$value['afdeling']][] = $value['nama'];
+        }
+
+        $qrAfd = DB::connection('mysql2')->table('afdeling')
+            ->select('*')
+            ->get();
+        $qrAfd = json_decode($qrAfd, true);
+
+        $blokEstNewFix = array();
+        foreach ($blokEstateFix as $key => $value) {
+            foreach ($qrAfd as $key1 => $value1) {
+                if ($value1['id'] == $key) {
+                    $afdelingNama = $value1['nama'];
+                }
+            }
+            $blokEstNewFix[$afdelingNama] = $value;
+        }
+
+        $queryBlok = DB::connection('mysql2')->table('blok')
+            ->select('*')
+            ->whereIn('afdeling', $listIdAfd)
+            ->get();
+        $queryBlok = json_decode($queryBlok, true);
+
+        $blokLatLn = array();
+        $inc = 0;
+        foreach ($blokEstNewFix as $key => $value) {
+            foreach ($value as $key1 => $value1) {
+                $latln = '';
+                foreach ($queryBlok as $key3 => $value4) {
+                    if ($value4['nama'] == $value1) {
+                        $latln .= $value4['lat'] . ',' . $value4['lon'] . '$';
+                    }
+                }
+
+                $blokLatLn[$inc]['afd'] = $key;
+                $blokLatLn[$inc]['blok'] = $value1;
+                $blokLatLn[$inc]['latln'] = rtrim($latln, '$');
+                $inc++;
+            }
+        }
+
+        $dtQuery = DB::connection('mysql2')->table('deficiency_tracker')
+            ->select('*')
+            ->where('est', $est)
+            ->get();
+        $dtQuery = json_decode($dtQuery, true);
+
+        $pkLatLn = array();
+        $incr = 0;
+        foreach ($dtQuery as $key => $value) {
+            $pkLatLn[$incr]['id'] = $value['id'];
+            $pkLatLn[$incr]['latln'] = $value['lat'] . ',' . $value['lon'];
+            $incr++;
+        }
+
+        $messageResponse = [];
+        foreach ($blokLatLn as $value) {
+            foreach ($pkLatLn as $marker) {
+                if (isPointInPolygon($marker['latln'], $value['latln'])) {
+                    DB::connection('mysql2')->table('deficiency_tracker')
+                        ->where('id', $marker['id'])
+                        ->update([
+                            'afd' => $value['afd'],
+                            'blok' => $value['blok']
+                        ]);
+                    $messageResponse[] = "Inside";
+                } else {
+                    $messageResponse[] = "Outside";
+                }
+            }
+        }
+
+        $response = [
+            'message' => 'Berhasil sinkronisasi data!',
+            'data' => $messageResponse
+        ];
+        
+        return response()->json($response);
+    }
+    
+    public function sinkronMaps()
+    {
+        $selectReg = DB::connection('mysql2')->table('reg')
+            ->select('reg.*')
+            ->whereNotIn('reg.id', [5])
+            ->get();
+        $selectReg = json_decode($selectReg, true);
+
+        $regArrSelected = [];
+        foreach ($selectReg as $key => $value) {
+            $regArrSelected[$key]['id'] = $value['id'];
+            $regArrSelected[$key]['nama'] = $value['nama'];
+        }
+        // dd($regArrSelected);
+
+        return view('Validate.synchronize', compact('regArrSelected'));
+    }
+
     public function mainMaps()
     {
         $selectReg = DB::connection('mysql2')->table('reg')

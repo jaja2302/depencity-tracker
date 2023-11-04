@@ -21,4 +21,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/getOptValidateAfd/{id}', [ValidateController::class, 'getOptValidateAfd'])->name('getOptValidateAfd');
     Route::get('/getCoordinatesValidate/{est}', [ValidateController::class, 'getCoordinatesValidate'])->name('getCoordinatesValidate');
     Route::post('/processValidate', [ValidateController::class, 'processValidate'])->name('processValidate');
+
+    Route::get('/sinkronMaps', [ValidateController::class, 'sinkronMaps'])->name('sinkronMaps');
+    Route::post('/processSynchronize', [ValidateController::class, 'processSynchronize'])->name('processSynchronize');
 });
