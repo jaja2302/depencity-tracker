@@ -708,132 +708,132 @@ class TrackerController extends Controller
                     }
                 }
 
-                foreach ($plot_kuning as $key => $value) {
-                    foreach ($value as $key2 => $value3) {
-                        // dd($value3);
-                        $afd = $value3['afd'];
-                        if (strlen($key) === 3 && $estate !== 'NBE' && $estate !== 'MRE') {
-                            $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'CBI') !== false && $estate !== 'BKE') {
-                            $newKey = str_replace("-CBI", "", $key);
-                            $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'T-') !== false  && $estate !== 'MRE') {
-                            $newKey = str_replace("T-", "", $key);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'P-') !== false  && $estate !== 'MRE' && $estate !== 'MLE') {
-                            $newKey = str_replace("P-", "", $key);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'CBI') !== false) {
-                            $newKey = str_replace("-CBI", "", $key);
-                            // $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strlen($key) === 3 && $estate == 'NBE' && strpos($key, 'D') !== false && $afd !== 'OA' && $afd !== 'OB') {
-                            $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strlen($key) === 3 && $estate == 'MRE') {
-                            $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'P-P') !== false && $estate == 'MRE') {
-                            $newKey = str_replace("-P", "0", $key);
-                            unset($plot_kuning[$key][$key]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'P-') !== false && $estate == 'MLE') {
-                            $keyx = str_replace("P-", "", $key);
-                            $newKey = substr($keyx, 0, 1) . '0' . substr($keyx, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } else {
-                            $plot_kuning[$key][$key2] = $value3;
-                        }
-                    }
-                }
+                // foreach ($plot_kuning as $key => $value) {
+                //     foreach ($value as $key2 => $value3) {
+                //         // dd($value3);
+                //         $afd = $value3['afd'];
+                //         if (strlen($key) === 3 && $estate !== 'NBE' && $estate !== 'MRE') {
+                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'CBI') !== false && $estate !== 'BKE') {
+                //             $newKey = str_replace("-CBI", "", $key);
+                //             $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'T-') !== false  && $estate !== 'MRE') {
+                //             $newKey = str_replace("T-", "", $key);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'P-') !== false  && $estate !== 'MRE' && $estate !== 'MLE') {
+                //             $newKey = str_replace("P-", "", $key);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'CBI') !== false) {
+                //             $newKey = str_replace("-CBI", "", $key);
+                //             // $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strlen($key) === 3 && $estate == 'NBE' && strpos($key, 'D') !== false && $afd !== 'OA' && $afd !== 'OB') {
+                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strlen($key) === 3 && $estate == 'MRE') {
+                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'P-P') !== false && $estate == 'MRE') {
+                //             $newKey = str_replace("-P", "0", $key);
+                //             unset($plot_kuning[$key][$key]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'P-') !== false && $estate == 'MLE') {
+                //             $keyx = str_replace("P-", "", $key);
+                //             $newKey = substr($keyx, 0, 1) . '0' . substr($keyx, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } else {
+                //             $plot_kuning[$key][$key2] = $value3;
+                //         }
+                //     }
+                // }
 
-                // dd($plot_kuning);
-                $filteredArray = [];
+                // // dd($plot_kuning);
+                // $filteredArray = [];
 
-                foreach ($plot_kuning as $key => $value) {
-                    if (!empty($value)) {
-                        // Add non-empty arrays to the filtered array
-                        $filteredArray[$key] = $value;
-                    }
-                }
+                // foreach ($plot_kuning as $key => $value) {
+                //     if (!empty($value)) {
+                //         // Add non-empty arrays to the filtered array
+                //         $filteredArray[$key] = $value;
+                //     }
+                // }
 
-                foreach ($drawBlok as $key => $value) {
-                    foreach ($value as $key2 => $value3) {
-                        $afd = $value3['afd_nama'];
-                        if (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'A') !== false) {
-                            $newKey = str_replace("A", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'B') !== false) {
-                            $newKey = str_replace("B", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                            $newKey = str_replace("T-", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                            $newKey = str_replace("T-", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-N') !== false && $estate == 'SPE'  && $afd !== 'OD') {
-                            $newKey = str_replace("P-", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate !== 'SPE' && $estate !== 'MLE') {
-                            $newKey = str_replace("P-", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && $estate == 'SPE'  && $afd == 'OD') {
-                            $newKey = str_replace("P-", "", $key2);
-                            $newKey = str_replace("A", "", $newKey);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 7 && $estate == 'MLE' && $afd == 'OC') {
-                            $kexa = str_replace("P-", "", $key2);
-                            $newKey = str_replace("B", "", $kexa);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate == 'MLE' && $estate !== 'SCE') {
-                            $kexa = str_replace("P-", "", $key2);
-                            // $newKey = str_replace("B", "", $kexa);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 5 && $estate == 'SCE') {
-                            $newKey = str_replace("B", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 3 && in_array($estate, ['BDE', 'KTE', 'MKE', 'PKE', 'BHE', 'BSE', 'BWE', 'GDE'])) {
-                            $newKey = substr($key2, 0, 1) . '0' . substr($key2, 1);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } else {
-                            $drawBlok[$key][$key2] = $value3;
-                        }
-                    }
-                }
+                // foreach ($drawBlok as $key => $value) {
+                //     foreach ($value as $key2 => $value3) {
+                //         $afd = $value3['afd_nama'];
+                //         if (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'A') !== false) {
+                //             $newKey = str_replace("A", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'B') !== false) {
+                //             $newKey = str_replace("B", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
+                //             $newKey = str_replace("T-", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
+                //             $newKey = str_replace("T-", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-N') !== false && $estate == 'SPE'  && $afd !== 'OD') {
+                //             $newKey = str_replace("P-", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate !== 'SPE' && $estate !== 'MLE') {
+                //             $newKey = str_replace("P-", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && $estate == 'SPE'  && $afd == 'OD') {
+                //             $newKey = str_replace("P-", "", $key2);
+                //             $newKey = str_replace("A", "", $newKey);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 7 && $estate == 'MLE' && $afd == 'OC') {
+                //             $kexa = str_replace("P-", "", $key2);
+                //             $newKey = str_replace("B", "", $kexa);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate == 'MLE' && $estate !== 'SCE') {
+                //             $kexa = str_replace("P-", "", $key2);
+                //             // $newKey = str_replace("B", "", $kexa);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 5 && $estate == 'SCE') {
+                //             $newKey = str_replace("B", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 3 && in_array($estate, ['BDE', 'KTE', 'MKE', 'PKE', 'BHE', 'BSE', 'BWE', 'GDE'])) {
+                //             $newKey = substr($key2, 0, 1) . '0' . substr($key2, 1);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } else {
+                //             $drawBlok[$key][$key2] = $value3;
+                //         }
+                //     }
+                // }
 
-                $filteredBlok = [];
+                // $filteredBlok = [];
 
-                foreach ($drawBlok as $key => $value) {
-                    if (!empty($value)) {
-                        // Add non-empty arrays to the filtered array
-                        $filteredBlok[$key] = $value;
-                    }
-                }
+                // foreach ($drawBlok as $key => $value) {
+                //     if (!empty($value)) {
+                //         // Add non-empty arrays to the filtered array
+                //         $filteredBlok[$key] = $value;
+                //     }
+                // }
                 // dd($filteredBlok, $filteredArray);
 
-                foreach ($filteredBlok as $key => $value) {
+                foreach ($drawBlok as $key => $value) {
                     $lat_lon = array(); // Initialize lat_lon as an empty array
                     $jumblok = 0; // Initialize jumblok to 0
                     $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
@@ -844,7 +844,7 @@ class TrackerController extends Controller
                         $verif = 0;
                         $statusCount = 0;
 
-                        foreach ($filteredArray as $key3 => $value3) {
+                        foreach ($plot_kuning as $key3 => $value3) {
                             if ($key === $key3) {
                                 $jumblok = count($value3);
                                 foreach ($value3 as $key4 => $value4) if ($value4['afd'] == $value2['afd_nama']) {
@@ -962,7 +962,7 @@ class TrackerController extends Controller
 
                 // dd($filteredArray);
                 $new_pk = array();
-                foreach ($filteredArray as $key => $value) {
+                foreach ($plot_kuning as $key => $value) {
                     foreach ($value as $key1 => $value1) {
 
                         if ($value1['jenis_pupuk_id'] != null) {
@@ -1057,68 +1057,68 @@ class TrackerController extends Controller
                 // dd($plot_kuning);
 
                 // dd($estate);
-                foreach ($plot_kuning as $key => $value) {
-                    foreach ($value as $key2 => $value3) {
-                        // dd($value3);
-                        $afd = $value3['afd'];
-                        if (strlen($key) === 3 && $estate !== 'NBE' && $estate !== 'MRE') {
-                            $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'CBI') !== false && $estate !== 'BKE') {
-                            $newKey = str_replace("-CBI", "", $key);
-                            $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'T-') !== false  && $estate !== 'MRE') {
-                            $newKey = str_replace("T-", "", $key);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'P-') !== false  && $estate !== 'MRE' && $estate !== 'MLE') {
-                            $newKey = str_replace("P-", "", $key);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'CBI') !== false) {
-                            $newKey = str_replace("-CBI", "", $key);
-                            // $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strlen($key) === 3 && $estate == 'NBE' && strpos($key, 'D') !== false && $afd !== 'OA' && $afd !== 'OB') {
-                            $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strlen($key) === 3 && $estate == 'MRE') {
-                            $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'P-P') !== false && $estate == 'MRE') {
-                            $newKey = str_replace("-P", "0", $key);
-                            unset($plot_kuning[$key][$key]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'P-') !== false && $estate == 'MLE') {
-                            $keyx = str_replace("P-", "", $key);
-                            $newKey = substr($keyx, 0, 1) . '0' . substr($keyx, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } else {
-                            $plot_kuning[$key][$key2] = $value3;
-                        }
-                    }
-                }
+                // foreach ($plot_kuning as $key => $value) {
+                //     foreach ($value as $key2 => $value3) {
+                //         // dd($value3);
+                //         $afd = $value3['afd'];
+                //         if (strlen($key) === 3 && $estate !== 'NBE' && $estate !== 'MRE') {
+                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'CBI') !== false && $estate !== 'BKE') {
+                //             $newKey = str_replace("-CBI", "", $key);
+                //             $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'T-') !== false  && $estate !== 'MRE') {
+                //             $newKey = str_replace("T-", "", $key);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'P-') !== false  && $estate !== 'MRE' && $estate !== 'MLE') {
+                //             $newKey = str_replace("P-", "", $key);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'CBI') !== false) {
+                //             $newKey = str_replace("-CBI", "", $key);
+                //             // $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strlen($key) === 3 && $estate == 'NBE' && strpos($key, 'D') !== false && $afd !== 'OA' && $afd !== 'OB') {
+                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strlen($key) === 3 && $estate == 'MRE') {
+                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'P-P') !== false && $estate == 'MRE') {
+                //             $newKey = str_replace("-P", "0", $key);
+                //             unset($plot_kuning[$key][$key]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'P-') !== false && $estate == 'MLE') {
+                //             $keyx = str_replace("P-", "", $key);
+                //             $newKey = substr($keyx, 0, 1) . '0' . substr($keyx, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } else {
+                //             $plot_kuning[$key][$key2] = $value3;
+                //         }
+                //     }
+                // }
 
-                // dd($plot_kuning);
-                $filteredArray = [];
+                // // dd($plot_kuning);
+                // $filteredArray = [];
 
-                foreach ($plot_kuning as $key => $value) {
-                    if (!empty($value)) {
-                        // Add non-empty arrays to the filtered array
-                        $filteredArray[$key] = $value;
-                    }
-                }
+                // foreach ($plot_kuning as $key => $value) {
+                //     if (!empty($value)) {
+                //         // Add non-empty arrays to the filtered array
+                //         $filteredArray[$key] = $value;
+                //     }
+                // }
 
                 // dd($filteredArray);
                 $new_pk = array();
-                foreach ($filteredArray as $key => $value) {
+                foreach ($plot_kuning as $key => $value) {
                     foreach ($value as $key1 => $value1) {
 
                         if ($value1['jenis_pupuk_id'] != null) {
@@ -1177,13 +1177,13 @@ class TrackerController extends Controller
                 // dd($datatables);
 
 
-                $count = array_reduce($filteredArray, function ($carry, $items) {
+                $count = array_reduce($plot_kuning, function ($carry, $items) {
                     return $carry + count(array_filter($items, function ($item) {
                         return $item['status'] !== "Sudah";
                     }));
                 }, 0);
 
-                $count_sudah = array_reduce($filteredArray, function ($carry, $items) {
+                $count_sudah = array_reduce($plot_kuning, function ($carry, $items) {
                     return $carry + count(array_filter($items, function ($item) {
                         return $item['status'] === "Sudah";
                     }));
@@ -1216,75 +1216,75 @@ class TrackerController extends Controller
                 // dd($drawBlok);
                 // dd($drawBlok, $outputArray);
 
-                foreach ($drawBlok as $key => $value) {
-                    foreach ($value as $key2 => $value3) {
-                        $afd = $value3['afd_nama'];
-                        if (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'A') !== false) {
-                            $newKey = str_replace("A", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'B') !== false) {
-                            $newKey = str_replace("B", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                            $newKey = str_replace("T-", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                            $newKey = str_replace("T-", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-N') !== false && $estate == 'SPE'  && $afd !== 'OD') {
-                            $newKey = str_replace("P-", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate !== 'SPE' && $estate !== 'MLE') {
-                            $newKey = str_replace("P-", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && $estate == 'SPE'  && $afd == 'OD') {
-                            $newKey = str_replace("P-", "", $key2);
-                            $newKey = str_replace("A", "", $newKey);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 7 && $estate == 'MLE' && $afd == 'OC') {
-                            $kexa = str_replace("P-", "", $key2);
-                            $newKey = str_replace("B", "", $kexa);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate == 'MLE' && $estate !== 'SCE') {
-                            $kexa = str_replace("P-", "", $key2);
-                            // $newKey = str_replace("B", "", $kexa);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 5 && $estate == 'SCE') {
-                            $newKey = str_replace("B", "", $key2);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 3 && in_array($estate, ['BDE', 'KTE', 'MKE', 'PKE', 'BHE', 'BSE', 'BWE', 'GDE'])) {
-                            $newKey = substr($key2, 0, 1) . '0' . substr($key2, 1);
-                            unset($drawBlok[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } else {
-                            $drawBlok[$key][$key2] = $value3;
-                        }
-                    }
-                }
+                // foreach ($drawBlok as $key => $value) {
+                //     foreach ($value as $key2 => $value3) {
+                //         $afd = $value3['afd_nama'];
+                //         if (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'A') !== false) {
+                //             $newKey = str_replace("A", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'B') !== false) {
+                //             $newKey = str_replace("B", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
+                //             $newKey = str_replace("T-", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
+                //             $newKey = str_replace("T-", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-N') !== false && $estate == 'SPE'  && $afd !== 'OD') {
+                //             $newKey = str_replace("P-", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate !== 'SPE' && $estate !== 'MLE') {
+                //             $newKey = str_replace("P-", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && $estate == 'SPE'  && $afd == 'OD') {
+                //             $newKey = str_replace("P-", "", $key2);
+                //             $newKey = str_replace("A", "", $newKey);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 7 && $estate == 'MLE' && $afd == 'OC') {
+                //             $kexa = str_replace("P-", "", $key2);
+                //             $newKey = str_replace("B", "", $kexa);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate == 'MLE' && $estate !== 'SCE') {
+                //             $kexa = str_replace("P-", "", $key2);
+                //             // $newKey = str_replace("B", "", $kexa);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 5 && $estate == 'SCE') {
+                //             $newKey = str_replace("B", "", $key2);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 3 && in_array($estate, ['BDE', 'KTE', 'MKE', 'PKE', 'BHE', 'BSE', 'BWE', 'GDE'])) {
+                //             $newKey = substr($key2, 0, 1) . '0' . substr($key2, 1);
+                //             unset($drawBlok[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } else {
+                //             $drawBlok[$key][$key2] = $value3;
+                //         }
+                //     }
+                // }
 
-                $filteredBlok = [];
+                // $filteredBlok = [];
 
-                foreach ($drawBlok as $key => $value) {
-                    if (!empty($value)) {
-                        // Add non-empty arrays to the filtered array
-                        $filteredBlok[$key] = $value;
-                    }
-                }
+                // foreach ($drawBlok as $key => $value) {
+                //     if (!empty($value)) {
+                //         // Add non-empty arrays to the filtered array
+                //         $filteredBlok[$key] = $value;
+                //     }
+                // }
                 // dd($filteredBlok, $filteredArray['G003']);
 
                 $new_blok = array();
 
-                foreach ($filteredBlok as $key => $value) {
+                foreach ($drawBlok as $key => $value) {
                     $lat_lon = array(); // Initialize lat_lon as an empty array
                     $jumblok = 0; // Initialize jumblok to 0
                     $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
@@ -1295,7 +1295,7 @@ class TrackerController extends Controller
                         $verif = 0;
                         $statusCount = 0;
 
-                        foreach ($filteredArray as $key3 => $value3) {
+                        foreach ($plot_kuning as $key3 => $value3) {
                             if ($key === $key3) {
                                 $jumblok = count($value3);
                                 foreach ($value3 as $key4 => $value4) {
@@ -1455,73 +1455,73 @@ class TrackerController extends Controller
                 $plot_kuning = json_decode($plot_kuning, true);
                 // dd($plot_kuning);
 
-                foreach ($plot_kuning as $key => $value) {
-                    foreach ($value as $key2 => $value3) {
-                        // dd($value3);
-                        $afd = $value3['afd'];
-                        if (strlen($key) === 3 && $estate !== 'NBE' && $estate !== 'MRE') {
-                            $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'CBI') !== false && $estate !== 'BKE') {
-                            $newKey = str_replace("-CBI", "", $key);
-                            $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'T-') !== false  && $estate !== 'MRE') {
-                            $newKey = str_replace("T-", "", $key);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'P-') !== false  && $estate !== 'MRE' && $estate !== 'MLE') {
-                            $newKey = str_replace("P-", "", $key);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'CBI') !== false) {
-                            $newKey = str_replace("-CBI", "", $key);
-                            // $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strlen($key) === 3 && $estate == 'NBE' && strpos($key, 'D') !== false && $afd !== 'OA' && $afd !== 'OB') {
-                            $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strlen($key) === 3 && $estate == 'MRE') {
-                            $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'P-P') !== false && $estate == 'MRE') {
-                            $newKey = str_replace("-P", "0", $key);
-                            unset($plot_kuning[$key][$key]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } elseif (strpos($key, 'P-') !== false && $estate == 'MLE') {
-                            $keyx = str_replace("P-", "", $key);
-                            $newKey = substr($keyx, 0, 1) . '0' . substr($keyx, 1);
-                            unset($plot_kuning[$key][$key2]);
-                            $plot_kuning[$newKey][$key2] = $value3;
-                        } else {
-                            $plot_kuning[$key][$key2] = $value3;
-                        }
-                    }
-                }
-                $filteredArray = [];
+                // foreach ($plot_kuning as $key => $value) {
+                //     foreach ($value as $key2 => $value3) {
+                //         // dd($value3);
+                //         $afd = $value3['afd'];
+                //         if (strlen($key) === 3 && $estate !== 'NBE' && $estate !== 'MRE') {
+                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'CBI') !== false && $estate !== 'BKE') {
+                //             $newKey = str_replace("-CBI", "", $key);
+                //             $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'T-') !== false  && $estate !== 'MRE') {
+                //             $newKey = str_replace("T-", "", $key);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'P-') !== false  && $estate !== 'MRE' && $estate !== 'MLE') {
+                //             $newKey = str_replace("P-", "", $key);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'CBI') !== false) {
+                //             $newKey = str_replace("-CBI", "", $key);
+                //             // $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strlen($key) === 3 && $estate == 'NBE' && strpos($key, 'D') !== false && $afd !== 'OA' && $afd !== 'OB') {
+                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strlen($key) === 3 && $estate == 'MRE') {
+                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'P-P') !== false && $estate == 'MRE') {
+                //             $newKey = str_replace("-P", "0", $key);
+                //             unset($plot_kuning[$key][$key]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } elseif (strpos($key, 'P-') !== false && $estate == 'MLE') {
+                //             $keyx = str_replace("P-", "", $key);
+                //             $newKey = substr($keyx, 0, 1) . '0' . substr($keyx, 1);
+                //             unset($plot_kuning[$key][$key2]);
+                //             $plot_kuning[$newKey][$key2] = $value3;
+                //         } else {
+                //             $plot_kuning[$key][$key2] = $value3;
+                //         }
+                //     }
+                // }
+                // $filteredArray = [];
 
 
 
-                foreach ($plot_kuning as $key => $value) {
-                    if (!empty($value)) {
-                        // Add non-empty arrays to the filtered array
-                        $filteredArray[$key] = $value;
-                    }
-                }
+                // foreach ($plot_kuning as $key => $value) {
+                //     if (!empty($value)) {
+                //         // Add non-empty arrays to the filtered array
+                //         $filteredArray[$key] = $value;
+                //     }
+                // }
 
 
-                $count = array_reduce($filteredArray, function ($carry, $items) {
+                $count = array_reduce($plot_kuning, function ($carry, $items) {
                     return $carry + count(array_filter($items, function ($item) {
                         return $item['status'] !== "Sudah";
                     }));
                 }, 0);
 
-                $count_sudah = array_reduce($filteredArray, function ($carry, $items) {
+                $count_sudah = array_reduce($plot_kuning, function ($carry, $items) {
                     return $carry + count(array_filter($items, function ($item) {
                         return $item['status'] === "Sudah";
                     }));
@@ -1553,78 +1553,78 @@ class TrackerController extends Controller
 
                 // dd($plot_kuning);
 
-                foreach ($drawBlok as $key => $value) {
-                    foreach ($value as $key2 => $value3) {
-                        $afd = $value3['afd_nama'];
-                        if (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'A') !== false) {
-                            $newKey = str_replace("A", "", $key2);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'B') !== false) {
-                            $newKey = str_replace("B", "", $key2);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                            $newKey = str_replace("T-", "", $key2);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                            $newKey = str_replace("T-", "", $key2);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-N') !== false && $estate == 'SPE'  && $afd !== 'OD') {
-                            $newKey = str_replace("P-", "", $key2);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate !== 'SPE' && $estate !== 'MLE') {
-                            $newKey = str_replace("P-", "", $key2);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && $estate == 'SPE'  && $afd == 'OD') {
-                            $newKey = str_replace("P-", "", $key2);
-                            $newKey = str_replace("A", "", $newKey);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 7 && $estate == 'MLE' && $afd == 'OC') {
-                            $kexa = str_replace("P-", "", $key2);
-                            $newKey = str_replace("B", "", $kexa);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate == 'MLE' && $estate !== 'SCE') {
-                            $kexa = str_replace("P-", "", $key2);
-                            // $newKey = str_replace("B", "", $kexa);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 5 && $estate == 'SCE') {
-                            $newKey = str_replace("B", "", $key2);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } elseif (strlen($key2) === 3 && in_array($estate, ['BDE', 'KTE', 'MKE', 'PKE', 'BHE', 'BSE', 'BWE', 'GDE'])) {
-                            $newKey = substr($key2, 0, 1) . '0' . substr($key2, 1);
-                            unset($plotAfd[$key][$key2]);
-                            $drawBlok[$key][$newKey] = $value3;
-                        } else {
-                            $drawBlok[$key][$key2] = $value3;
-                        }
-                    }
-                }
+                // foreach ($drawBlok as $key => $value) {
+                //     foreach ($value as $key2 => $value3) {
+                //         $afd = $value3['afd_nama'];
+                //         if (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'A') !== false) {
+                //             $newKey = str_replace("A", "", $key2);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'B') !== false) {
+                //             $newKey = str_replace("B", "", $key2);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
+                //             $newKey = str_replace("T-", "", $key2);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
+                //             $newKey = str_replace("T-", "", $key2);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-N') !== false && $estate == 'SPE'  && $afd !== 'OD') {
+                //             $newKey = str_replace("P-", "", $key2);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate !== 'SPE' && $estate !== 'MLE') {
+                //             $newKey = str_replace("P-", "", $key2);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && $estate == 'SPE'  && $afd == 'OD') {
+                //             $newKey = str_replace("P-", "", $key2);
+                //             $newKey = str_replace("A", "", $newKey);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 7 && $estate == 'MLE' && $afd == 'OC') {
+                //             $kexa = str_replace("P-", "", $key2);
+                //             $newKey = str_replace("B", "", $kexa);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate == 'MLE' && $estate !== 'SCE') {
+                //             $kexa = str_replace("P-", "", $key2);
+                //             // $newKey = str_replace("B", "", $kexa);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 5 && $estate == 'SCE') {
+                //             $newKey = str_replace("B", "", $key2);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } elseif (strlen($key2) === 3 && in_array($estate, ['BDE', 'KTE', 'MKE', 'PKE', 'BHE', 'BSE', 'BWE', 'GDE'])) {
+                //             $newKey = substr($key2, 0, 1) . '0' . substr($key2, 1);
+                //             unset($plotAfd[$key][$key2]);
+                //             $drawBlok[$key][$newKey] = $value3;
+                //         } else {
+                //             $drawBlok[$key][$key2] = $value3;
+                //         }
+                //     }
+                // }
 
 
-                $filteredBlok = [];
+                // $filteredBlok = [];
 
-                foreach ($drawBlok as $key => $value) {
-                    if (!empty($value)) {
-                        // Add non-empty arrays to the filtered array
-                        $filteredBlok[$key] = $value;
-                    }
-                }
+                // foreach ($drawBlok as $key => $value) {
+                //     if (!empty($value)) {
+                //         // Add non-empty arrays to the filtered array
+                //         $filteredBlok[$key] = $value;
+                //     }
+                // }
 
-                asort($filteredArray);
+                asort($plot_kuning);
                 $new_blok = array();
 
                 // dd($filteredBlok, $filteredArray['G003']);
 
-                foreach ($filteredBlok as $key => $value) {
+                foreach ($drawBlok as $key => $value) {
                     $lat_lon = array(); // Initialize lat_lon as an empty array
                     $jumblok = 0; // Initialize jumblok to 0
                     $kategori = 'Blue'; // Initialize kategori as 'Blue' by default
@@ -1635,7 +1635,7 @@ class TrackerController extends Controller
                         $verif = 0;
                         $statusCount = 0;
 
-                        foreach ($filteredArray as $key3 => $value3) {
+                        foreach ($plot_kuning as $key3 => $value3) {
                             if ($key === $key3) {
                                 $jumblok = count($value3);
                                 foreach ($value3 as $key4 => $value4) {
@@ -1723,7 +1723,7 @@ class TrackerController extends Controller
                 // dd($totalpk);
 
                 $new_pk = array();
-                foreach ($filteredArray as $key => $value) {
+                foreach ($plot_kuning as $key => $value) {
                     foreach ($new_blok as $key2 => $value2) if ($key == $key2) {
                         foreach ($value as $key1 => $value1) {
 
