@@ -1415,34 +1415,40 @@
                     var persen_ditangani = plot['persen_ditangani'];
                     var pemupukan = plot['pemupukan'];
                     // console.log(totalx);
+                    var ktg_pk = plot['ktg_pk'];
+                    var ditangani_pk = plot['ditangani_pk'];
+                    var belum_pk = plot['belum_pk'];
+                    var jum_pokok = plot['jum_pokok'];
+
+                    var newcounting = plot['newcounting'];
+                    var totalpknew = newcounting['totalpokok']
+                    var totalbelumditanganinew = newcounting['totalbelum']
+                    var totalditangaininew = newcounting['totalsudah']
+                    var persentaseditanganinew = newcounting['persentase']
+
 
                     const totalPkElement = document.getElementById("total_pk");
                     const total_pkkuning = document.getElementById("total_pkkuning");
-
-
-
+                    const total_ditanganix = document.getElementById("sembuh_pk");
+                    const persen_ditanganix = document.getElementById("persen_pk");
 
                     if (total_pkkuning) {
-                        total_pkkuning.textContent = parseInt(totalx) + parseInt(total_ditangani);
+                        total_pkkuning.textContent = parseInt(totalpknew);
                     } else {
                         console.error("Element with id 'total_pk' not found.");
                     }
                     if (totalPkElement) {
-                        totalPkElement.textContent = totalx;
+                        totalPkElement.textContent = totalbelumditanganinew;
                     } else {
                         console.error("Element with id 'total_pk' not found.");
                     }
-                    const total_ditanganix = document.getElementById("sembuh_pk");
-
                     if (total_ditanganix) {
-                        total_ditanganix.textContent = total_ditangani;
+                        total_ditanganix.textContent = totalditangaininew;
                     } else {
                         console.error("Element with id 'total_pk' not found.");
                     }
-                    const persen_ditanganix = document.getElementById("persen_pk");
-
                     if (persen_ditanganix) {
-                        persen_ditanganix.textContent = persen_ditangani + '%';
+                        persen_ditanganix.textContent = persentaseditanganinew + '%';
                     } else {
                         console.error("Element with id 'total_pk' not found.");
                     }
@@ -1597,97 +1603,8 @@
 
 
 
-                    var listQC = $('#user_qc').DataTable({
-                        columns: [{
-                                title: 'ID',
-                                data: 'id',
-                            },
-                            {
-                                title: 'Estate',
-                                data: 'est',
-                            },
-                            {
-                                title: 'Afdeling',
-                                data: 'afd',
-                            },
-                            {
-                                title: 'Blok',
-                                data: 'blok',
-                            },
-                            {
-                                // -1 targets the last column
-                                title: 'Actions',
-                                visible: (user_name === 'Aan Syahputra'),
-                                render: function(data, type, row, meta) {
-                                    var buttons =
-                                        '<button class="edit-btn">Edit</button>'
-                                    return buttons;
-                                }
-                            }
-                        ],
-
-                    });
-
-                    // Populate DataTable with data
-                    listQC.clear().rows.add(plot['datatables']).draw();
-
-                    $('#user_qc').on('click', '.edit-btn', function() {
-                        var rowData = listQC.row($(this).closest('tr')).data();
-                        var rowIndex = listQC.row($(this).closest('tr')).index();
-                        editqc(rowIndex);
-                    });
-
-                    function editqc(id) {
-                        selectedRowIndex = id;
-                        var rowData = listQC.row(id).data();
-                        var blok = rowData.blok;
-                        var _token = $('input[name="_token"]').val();
-
-                        Swal.fire({
-                            title: 'Masukan Blok',
-                            input: 'text',
-                            inputLabel: 'Edit nama Blok',
-                            inputValue: blok,
-                            inputAttributes: {
-                                maxlength: 50,
-                                autocapitalize: 'off',
-                                autocorrect: 'off'
-                            },
-                            showCancelButton: true,
-                            confirmButtonText: 'Save', // Change the text of the confirm button to "Save"
-                            showLoaderOnConfirm: true, // Show a loading spinner on the confirm button
-                            preConfirm: (newBlok) => { // Handle the confirmation
-                                return $.ajax({
-                                    type: 'POST',
-                                    url: '{{ route("updateUserqc") }}',
-                                    data: {
-                                        id: rowData.id,
-                                        blok: newBlok, // Use the new value entered by the user
-                                    },
-                                    headers: {
-                                        'X-CSRF-TOKEN': _token
-                                    }
-                                });
-                            },
-                            allowOutsideClick: () => !Swal.isLoading() // Prevent closing the dialog while loading
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                Swal.fire('Disimpan!', 'User QC sudah diupdate!', 'success');
-                                setTimeout(function() {
-                                    location.reload();
-                                }, 3000); // 3000 milliseconds = 3 seconds
-                            } else if (result.isDenied) {
-                                Swal.fire('Batal', 'Pengeditan dibatalkan.', 'info');
-                            }
-                        });
-                    }
 
 
-
-                    var ktg_pk = plot['ktg_pk'];
-                    var ditangani_pk = plot['ditangani_pk'];
-                    var belum_pk = plot['belum_pk'];
-                    var jum_pokok = plot['jum_pokok'];
 
                     // console.log(ktg_pk);
                     chart.updateSeries([{
@@ -1745,7 +1662,7 @@
                     Swal.close();
                     var plot = JSON.parse(result);
 
-
+                    // console.log(plot);
                     var DataTables = $('#list_pokok').DataTable({
                         dom: 'Bfrtip',
                         buttons: ['excel', 'pdf', ],
@@ -1776,6 +1693,10 @@
                             {
                                 title: 'Petugas',
                                 data: 'petugas',
+                            },
+                            {
+                                title: 'Dosis Pupuk',
+                                data: 'dosis_pupuk',
                             },
                             {
                                 title: 'Datetime',
@@ -1832,49 +1753,4 @@
 
 
     populateAfdelingOptions(defaultSelectedEstateEst);
-
-    // edit tool untuk gambar map 
-    // var drawnItems = new L.FeatureGroup();
-    // map.addLayer(drawnItems);
-
-    // var drawControl = new L.Control.Draw({
-    //     edit: {
-    //         featureGroup: drawnItems,
-    //         poly: {
-    //             allowIntersection: false
-    //         }
-    //     },
-    //     draw: {
-    //         polygon: {
-    //             allowIntersection: false,
-    //             showArea: true
-    //         }
-    //     }
-    // });
-    // map.addControl(drawControl);
-    // map.on('draw:created', function(e) {
-    //     var layer = e.layer;
-    //     drawnItems.addLayer(layer);
-
-    //     // Access the polygon's coordinates
-    //     var polygonCoordinates = layer.getLatLngs();
-    //     console.log('Polygon Coordinates:', polygonCoordinates);
-
-    //     $('#saveButton').click(function() {
-    //         // Assuming you have the coordinates in an array named 'polygonCoordinates'
-    //         var textData = polygonCoordinates.map(function(latLng) {
-    //             return 'est' + 'afd' + latLng.lat + ',' + latLng.lng;
-    //         }).join('\n');
-
-    //         // Create a Blob with the text data and save it as a TXT file
-    //         var blob = new Blob([textData], {
-    //             type: 'text/plain;charset=utf-8'
-    //         });
-
-    //         // Save the Blob as a TXT file
-    //         saveAs(blob, 'coordinates.txt');
-    //     });
-    // });
-
-    // end edit tool gambar map 
 </script>

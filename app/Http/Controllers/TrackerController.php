@@ -272,6 +272,8 @@ class TrackerController extends Controller
 
         // $datatables = json_decode($datatables, true);
 
+        $test = 'PK_20231103_100334_NBE_OC_E19.jpg$PK_20231103_100334_NBE_OC_E19.jpg$PK_20231103_100334_NBE_OC_E19.jpg||PK_20231103_100334_NBE_OC_E19.jpg$PK_20231103_100334_NBE_OC_E19.jpg';
+
 
         // Your dashboard logic goes here
         return view('Tracking.dashboard', [
@@ -363,25 +365,30 @@ class TrackerController extends Controller
                 $plot_kuning = $plot_kuning->groupBy(['est']);
                 $plot_kuning = json_decode($plot_kuning, true);
 
-                $count = array_reduce($plot_kuning, function ($carry, $items) {
-                    return $carry + count(array_filter($items, function ($item) {
-                        return $item['status'] !== "Sudah";
-                    }));
-                }, 0);
+                $count = DB::connection('mysql2')
+                    ->table('deficiency_tracker')
+                    ->select(
+                        DB::raw('SUM(CASE WHEN status = "Sudah" THEN 1 ELSE 0 END) as totalsudah'),
+                        DB::raw('SUM(CASE WHEN status = "Belum" THEN 1 ELSE 0 END) as totalbelum'),
+                        DB::raw('SUM(CASE WHEN kondisi = "Sembuh" THEN 1 ELSE 0 END) as totalsembuh'),
+                        DB::raw('COUNT(*) as totalpokok')
+                    )
+                    ->join('estate', 'estate.est', '=', 'deficiency_tracker.est')
+                    ->join('wil', 'wil.id', '=', 'estate.wil')
+                    ->where('wil.regional', '=', $regional)
+                    ->get()
+                    ->first();
 
-                $count_sudah = array_reduce($plot_kuning, function ($carry, $items) {
-                    return $carry + count(array_filter($items, function ($item) {
-                        return $item['status'] === "Sudah";
-                    }));
-                }, 0);
 
-                // $count_sudah = 0;
+                $datacounting = [
+                    'totalsudah' => $count->totalsudah,
+                    'totalbelum' => $count->totalbelum,
+                    'totalpokok' => $count->totalpokok,
+                    'totalsembuh' => $count->totalsembuh,
+                    'persentase' => round(($count->totalsudah /  ($count->totalpokok +  $count->totalsudah)) * 100, 2)
+                ];
+                // dd($datacounting);
 
-                if (($count + $count_sudah) !== 0) {
-                    $percentage_sudah = round(($count_sudah / ($count + $count_sudah)) * 100, 2);
-                } else {
-                    $percentage_sudah = 0; // Set a default value (0 or any other suitable value) when the denominator is zero.
-                }
 
 
                 $drawBlok = DB::connection('mysql2')
@@ -624,9 +631,8 @@ class TrackerController extends Controller
                 $arrView['datatables'] = $values;
                 $arrView['drawBlok'] = $drawBlok;
                 $arrView['total_pokok'] = $count;
-                $arrView['total_ditangani'] = $count_sudah;
-                $arrView['persen_ditangani'] = $percentage_sudah;
-                // $arrView['blok'] = $plotEst;
+                $arrView['newcounting'] = $datacounting;
+
                 $arrView['pokok'] = $new_pk;
 
                 // dd($plotEst);
@@ -646,27 +652,32 @@ class TrackerController extends Controller
                 $plot_kuning = json_decode($plot_kuning, true);
 
 
-                $count = array_reduce($plot_kuning, function ($carry, $items) {
-                    return $carry + count(array_filter($items, function ($item) {
-                        return $item['status'] !== "Sudah";
-                    }));
-                }, 0);
 
-                $count_sudah = array_reduce($plot_kuning, function ($carry, $items) {
-                    return $carry + count(array_filter($items, function ($item) {
-                        return $item['status'] === "Sudah";
-                    }));
-                }, 0);
-
-                // dd($plot_kuning);
-
+                $count = DB::connection('mysql2')
+                    ->table('deficiency_tracker')
+                    ->select(
+                        DB::raw('SUM(CASE WHEN status = "Sudah" THEN 1 ELSE 0 END) as totalsudah'),
+                        DB::raw('SUM(CASE WHEN status = "Belum" THEN 1 ELSE 0 END) as totalbelum'),
+                        DB::raw('SUM(CASE WHEN kondisi = "Sembuh" THEN 1 ELSE 0 END) as totalsembuh'),
+                        DB::raw('COUNT(*) as totalpokok')
+                    )
+                    ->where('deficiency_tracker.est', '=', $estate)
+                    ->get()
+                    ->first();
 
 
-                if (($count + $count_sudah) !== 0) {
-                    $percentage_sudah = round(($count_sudah / ($count + $count_sudah)) * 100, 2);
-                } else {
-                    $percentage_sudah = 0; // Set a default value (0 or any other suitable value) when the denominator is zero.
-                }
+                $datacounting = [
+                    'totalsudah' => $count->totalsudah,
+                    'totalbelum' => $count->totalbelum,
+                    'totalpokok' => $count->totalpokok,
+                    'totalsembuh' => $count->totalsembuh,
+                    'persentase' => round(($count->totalsudah /  ($count->totalpokok +  $count->totalsudah)) * 100, 2)
+                ];
+                // dd($datacounting);
+
+
+
+
 
                 $drawBlok = DB::connection('mysql2')
                     ->table('blok')
@@ -708,130 +719,7 @@ class TrackerController extends Controller
                     }
                 }
 
-                // foreach ($plot_kuning as $key => $value) {
-                //     foreach ($value as $key2 => $value3) {
-                //         // dd($value3);
-                //         $afd = $value3['afd'];
-                //         if (strlen($key) === 3 && $estate !== 'NBE' && $estate !== 'MRE') {
-                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'CBI') !== false && $estate !== 'BKE') {
-                //             $newKey = str_replace("-CBI", "", $key);
-                //             $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'T-') !== false  && $estate !== 'MRE') {
-                //             $newKey = str_replace("T-", "", $key);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'P-') !== false  && $estate !== 'MRE' && $estate !== 'MLE') {
-                //             $newKey = str_replace("P-", "", $key);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'CBI') !== false) {
-                //             $newKey = str_replace("-CBI", "", $key);
-                //             // $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strlen($key) === 3 && $estate == 'NBE' && strpos($key, 'D') !== false && $afd !== 'OA' && $afd !== 'OB') {
-                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strlen($key) === 3 && $estate == 'MRE') {
-                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'P-P') !== false && $estate == 'MRE') {
-                //             $newKey = str_replace("-P", "0", $key);
-                //             unset($plot_kuning[$key][$key]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'P-') !== false && $estate == 'MLE') {
-                //             $keyx = str_replace("P-", "", $key);
-                //             $newKey = substr($keyx, 0, 1) . '0' . substr($keyx, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } else {
-                //             $plot_kuning[$key][$key2] = $value3;
-                //         }
-                //     }
-                // }
 
-                // // dd($plot_kuning);
-                // $filteredArray = [];
-
-                // foreach ($plot_kuning as $key => $value) {
-                //     if (!empty($value)) {
-                //         // Add non-empty arrays to the filtered array
-                //         $filteredArray[$key] = $value;
-                //     }
-                // }
-
-                // foreach ($drawBlok as $key => $value) {
-                //     foreach ($value as $key2 => $value3) {
-                //         $afd = $value3['afd_nama'];
-                //         if (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'A') !== false) {
-                //             $newKey = str_replace("A", "", $key2);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'B') !== false) {
-                //             $newKey = str_replace("B", "", $key2);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                //             $newKey = str_replace("T-", "", $key2);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                //             $newKey = str_replace("T-", "", $key2);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-N') !== false && $estate == 'SPE'  && $afd !== 'OD') {
-                //             $newKey = str_replace("P-", "", $key2);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate !== 'SPE' && $estate !== 'MLE') {
-                //             $newKey = str_replace("P-", "", $key2);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && $estate == 'SPE'  && $afd == 'OD') {
-                //             $newKey = str_replace("P-", "", $key2);
-                //             $newKey = str_replace("A", "", $newKey);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 7 && $estate == 'MLE' && $afd == 'OC') {
-                //             $kexa = str_replace("P-", "", $key2);
-                //             $newKey = str_replace("B", "", $kexa);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate == 'MLE' && $estate !== 'SCE') {
-                //             $kexa = str_replace("P-", "", $key2);
-                //             // $newKey = str_replace("B", "", $kexa);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 5 && $estate == 'SCE') {
-                //             $newKey = str_replace("B", "", $key2);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 3 && in_array($estate, ['BDE', 'KTE', 'MKE', 'PKE', 'BHE', 'BSE', 'BWE', 'GDE'])) {
-                //             $newKey = substr($key2, 0, 1) . '0' . substr($key2, 1);
-                //             unset($drawBlok[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } else {
-                //             $drawBlok[$key][$key2] = $value3;
-                //         }
-                //     }
-                // }
-
-                // $filteredBlok = [];
-
-                // foreach ($drawBlok as $key => $value) {
-                //     if (!empty($value)) {
-                //         // Add non-empty arrays to the filtered array
-                //         $filteredBlok[$key] = $value;
-                //     }
-                // }
-                // dd($filteredBlok, $filteredArray);
 
                 foreach ($drawBlok as $key => $value) {
                     $lat_lon = array(); // Initialize lat_lon as an empty array
@@ -915,6 +803,12 @@ class TrackerController extends Controller
                     $new_blok[$key]['lat_lon'] = $lat_lon;
                 }
                 // dd($new_blok);
+
+
+
+
+
+
                 $graph = DB::connection('mysql2')
                     ->table('deficiency_tracker')
                     ->select('deficiency_tracker.*')
@@ -960,7 +854,7 @@ class TrackerController extends Controller
                 $arrView['jum_pokok'] = $jum_pokok;
 
 
-                // dd($filteredArray);
+                // dd($arrView);
                 $new_pk = array();
                 foreach ($plot_kuning as $key => $value) {
                     foreach ($value as $key1 => $value1) {
@@ -1024,14 +918,17 @@ class TrackerController extends Controller
                     'status_15' => '-',
                     'status_16' => '-',
                 ];
+
+
+
+
                 $arrView['pemupukan'] = $final_ppk;
 
                 $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $values;
                 $arrView['drawBlok'] = $drawBlok;
                 $arrView['total_pokok'] = $count;
-                $arrView['total_ditangani'] = $count_sudah;
-                $arrView['persen_ditangani'] = $percentage_sudah;
+                $arrView['newcounting'] = $datacounting;
                 $arrView['pokok'] = $new_pk;
 
                 break;
@@ -1138,6 +1035,25 @@ class TrackerController extends Controller
                             $new_ppk = null;
                             $komnt_ppk = null;
                         }
+                        $foto = $value1['foto'];
+
+                        if (strpos($foto, '||') !== false) {
+                            $array = explode('||', $foto); // Use '||' to split the string
+
+                            // Remove empty elements from the array
+                            $array = array_filter($array);
+
+                            // Reset array keys to start from 0
+                            $array = array_values($array);
+
+                            // Get the last non-empty value
+                            $lastValue = end($array);
+                        } else {
+                            $lastValue = $foto;
+                        }
+
+
+
 
 
 
@@ -1150,7 +1066,7 @@ class TrackerController extends Controller
                         $new_pk[$key][$key1]['blok'] = $key;
                         $new_pk[$key][$key1]['kondisi'] = $value1['kondisi'];
                         $new_pk[$key][$key1]['status'] = $value1['status'];
-                        $new_pk[$key][$key1]['foto'] = $value1['foto'];
+                        $new_pk[$key][$key1]['foto'] = $lastValue;
                         $new_pk[$key][$key1]['komentar'] = $value1['komentar'];
                         $new_pk[$key][$key1]['id'] = $value1['id'];
                         $new_pk[$key][$key1]['afd'] = $value1['afd'];
@@ -1176,26 +1092,6 @@ class TrackerController extends Controller
 
                 // dd($datatables);
 
-
-                $count = array_reduce($plot_kuning, function ($carry, $items) {
-                    return $carry + count(array_filter($items, function ($item) {
-                        return $item['status'] !== "Sudah";
-                    }));
-                }, 0);
-
-                $count_sudah = array_reduce($plot_kuning, function ($carry, $items) {
-                    return $carry + count(array_filter($items, function ($item) {
-                        return $item['status'] === "Sudah";
-                    }));
-                }, 0);
-
-                // $count_sudah = 0;
-
-                if (($count + $count_sudah) !== 0) {
-                    $percentage_sudah = round(($count_sudah / ($count + $count_sudah)) * 100, 2);
-                } else {
-                    $percentage_sudah = 0; // Set a default value (0 or any other suitable value) when the denominator is zero.
-                }
 
 
 
@@ -1398,7 +1294,32 @@ class TrackerController extends Controller
                     'status_16' => '-',
                 ];
 
-                // dd($new_blok);
+
+                $count = DB::connection('mysql2')
+                    ->table('deficiency_tracker')
+                    ->select(
+                        DB::raw('SUM(CASE WHEN status = "Sudah" THEN 1 ELSE 0 END) as totalsudah'),
+                        DB::raw('SUM(CASE WHEN status = "Belum" THEN 1 ELSE 0 END) as totalbelum'),
+                        DB::raw('SUM(CASE WHEN kondisi = "Sembuh" THEN 1 ELSE 0 END) as totalsembuh'),
+                        DB::raw('COUNT(*) as totalpokok')
+                    )
+                    ->join('afdeling', 'afdeling.nama', '=', 'deficiency_tracker.afd')
+                    ->where('deficiency_tracker.est', '=', $estate)
+                    ->where('afdeling.id', '=', $afdeling)
+                    ->get()
+                    ->first();
+
+
+                $datacounting = [
+                    'totalsudah' => $count->totalsudah,
+                    'totalbelum' => $count->totalbelum,
+                    'totalpokok' => $count->totalpokok,
+                    'totalsembuh' => $count->totalsembuh,
+                    'persentase' => round(($count->totalsudah /  ($count->totalpokok +  $count->totalsudah)) * 100, 2)
+                ];
+
+                // dd($datacounting);
+
                 $arrView['pemupukan'] = $final_ppk;
                 $arrView['ktg_pk'] = $ktg;
                 $arrView['jum_pokok'] = $jum_pokok;
@@ -1408,11 +1329,11 @@ class TrackerController extends Controller
                 $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $datatables;
                 $arrView['drawBlok'] = $drawBlok;
-                $arrView['total_pokok'] = $count;
-                $arrView['total_ditangani'] = $count_sudah;
-                $arrView['persen_ditangani'] = $percentage_sudah;
+                $arrView['total_pokok'] = $jum_pokok;
+                $arrView['total_ditangani'] = $belum;
                 $arrView['blok'] = [];
                 $arrView['pokok'] = $new_pk;
+                $arrView['newcounting'] = $datacounting;
                 break;
 
             case 'blok':
@@ -1551,74 +1472,7 @@ class TrackerController extends Controller
                 $drawBlok = $drawBlok->groupBy(['nama']);
                 $drawBlok = json_decode($drawBlok, true);
 
-                // dd($plot_kuning);
-
-                // foreach ($drawBlok as $key => $value) {
-                //     foreach ($value as $key2 => $value3) {
-                //         $afd = $value3['afd_nama'];
-                //         if (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'A') !== false) {
-                //             $newKey = str_replace("A", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'B') !== false) {
-                //             $newKey = str_replace("B", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                //             $newKey = str_replace("T-", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                //             $newKey = str_replace("T-", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-N') !== false && $estate == 'SPE'  && $afd !== 'OD') {
-                //             $newKey = str_replace("P-", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate !== 'SPE' && $estate !== 'MLE') {
-                //             $newKey = str_replace("P-", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && $estate == 'SPE'  && $afd == 'OD') {
-                //             $newKey = str_replace("P-", "", $key2);
-                //             $newKey = str_replace("A", "", $newKey);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 7 && $estate == 'MLE' && $afd == 'OC') {
-                //             $kexa = str_replace("P-", "", $key2);
-                //             $newKey = str_replace("B", "", $kexa);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate == 'MLE' && $estate !== 'SCE') {
-                //             $kexa = str_replace("P-", "", $key2);
-                //             // $newKey = str_replace("B", "", $kexa);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 5 && $estate == 'SCE') {
-                //             $newKey = str_replace("B", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 3 && in_array($estate, ['BDE', 'KTE', 'MKE', 'PKE', 'BHE', 'BSE', 'BWE', 'GDE'])) {
-                //             $newKey = substr($key2, 0, 1) . '0' . substr($key2, 1);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } else {
-                //             $drawBlok[$key][$key2] = $value3;
-                //         }
-                //     }
-                // }
-
-
-                // $filteredBlok = [];
-
-                // foreach ($drawBlok as $key => $value) {
-                //     if (!empty($value)) {
-                //         // Add non-empty arrays to the filtered array
-                //         $filteredBlok[$key] = $value;
-                //     }
-                // }
-
+                // 
                 asort($plot_kuning);
                 $new_blok = array();
 
@@ -1699,28 +1553,8 @@ class TrackerController extends Controller
                 // Your code continues here
                 // dd($new_blok);
 
-                foreach ($new_blok as $key => $value) {
-                    $ktg[] = $key;
-                    $sudah[] = $value['Ditangani'];
-                    $belum[] = $value['Belum'];
-                    $jum_pokok[] = $value['jum_pokok'];
-                }
 
 
-                // dd($new_blok);
-
-                foreach ($new_blok as $key => $value) {
-                    # code...
-                    $totalpk = $value['jum_pokok'];
-                    $Ditangani = $value['Ditangani'];
-                    if ($totalpk != 0) {
-                        $progres = round(($Ditangani / $totalpk) * 100, 2);
-                    } else {
-                        // Handle the case where $totalpk is zero (division by zero error)
-                        $progres = 0; // You can set it to zero or handle it differently based on your requirements.
-                    }
-                }
-                // dd($totalpk);
 
                 $new_pk = array();
                 foreach ($plot_kuning as $key => $value) {
@@ -1979,15 +1813,37 @@ class TrackerController extends Controller
                 // dd($new_blok);
 
                 // dd($new_blok['jum_pokok']);
-                $jum_pkok = [];
+
+                foreach ($new_blok as $key => $value) {
+                    $ktg[] = $key;
+                    $sudah[] = $value['Ditangani'];
+                    $belum[] = $value['Belum'];
+                    $jum_pokok[] = $value['jum_pokok'];
+                }
+                // dd($new_blok);
+
+
                 foreach ($new_blok as $key => $value) {
                     # code...
-                    // dd($value);
-                    $jum_pkok[] = $value['jum_pokok'];
-                    $ditangani[] = $value['Ditangani'];
+                    $totalpk = $value['jum_pokok'];
+                    $Ditangani = $value['Ditangani'];
+                    if ($totalpk != 0) {
+                        $progres = round(($Ditangani / $totalpk) * 100, 2);
+                    } else {
+                        // Handle the case where $totalpk is zero (division by zero error)
+                        $progres = 0; // You can set it to zero or handle it differently based on your requirements.
+                    }
                 }
+                // dd($totalpk, $Ditangani, $progres);
 
-                // dd($jum_pkok);
+                $datacounting = [
+                    'totalsudah' => $Ditangani,
+                    'totalbelum' => $belum,
+                    'totalpokok' => $totalpk,
+                    'totalsembuh' => 0,
+                    'persentase' => $progres
+                ];
+                // dd($jum_pokok);
                 $arrView['pemupukan'] = $final_ppk;
                 $values = [];
                 $arrView['ktg_pk'] = $ktg;
@@ -1997,11 +1853,12 @@ class TrackerController extends Controller
                 $arrView['new_blok'] = $new_blok;
                 $arrView['datatables'] = $values;
                 $arrView['drawBlok'] = $drawBlok;
-                $arrView['total_pokok'] = $jum_pkok;
-                $arrView['total_ditangani'] = $ditangani;
+                $arrView['total_pokok'] = $jum_pokok;
+                $arrView['total_ditangani'] = $Ditangani;
                 $arrView['persen_ditangani'] = $progres;
                 $arrView['blok'] = $plotBlok;
                 $arrView['pokok'] = $new_pk;
+                $arrView['newcounting'] = $datacounting;
 
                 break;
 
@@ -2054,24 +1911,6 @@ class TrackerController extends Controller
                 $arrView['datatables'] = $dtracker_est;
                 break;
             case 'afdeling':
-                // dd($afdeling);
-
-                // $datatables = DB::connection('mysql2')
-                //     ->table('deficiency_tracker')
-                //     ->select('deficiency_tracker.*')
-                //     ->join('afdeling', 'afdeling.nama', '=', 'deficiency_tracker.afd')
-                //     ->where('deficiency_tracker.est', '=', 'KNE')
-                //     ->where('afdeling.id', '=', 1)
-                //     ->orderBy('blok', 'desc') // Sort by 'id' column in descending order
-                //     ->get();
-
-                // // $datatables = $datatables->groupBy(['blok']);
-                // $datatables = json_decode($datatables, true);
-
-                // dd($datatables);
-
-                // dd($plot_kuning['G03']);
-
                 $datatables = DeficiencyTracker::join('afdeling', 'afdeling.nama', '=', 'deficiency_tracker.afd')
                     ->where('deficiency_tracker.est', $estate)
                     ->where('afdeling.id', $afdeling)
@@ -2096,66 +1935,7 @@ class TrackerController extends Controller
 
                 $plot_kuning = $plot_kuning->groupBy(['blok']);
                 $plot_kuning = json_decode($plot_kuning, true);
-                // dd($plot_kuning);
 
-                // foreach ($plot_kuning as $key => $value) {
-                //     foreach ($value as $key2 => $value3) {
-                //         // dd($value3);
-                //         $afd = $value3['afd'];
-                //         if (strlen($key) === 3 && $estate !== 'NBE' && $estate !== 'MRE') {
-                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'CBI') !== false && $estate !== 'BKE') {
-                //             $newKey = str_replace("-CBI", "", $key);
-                //             $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'T-') !== false  && $estate !== 'MRE') {
-                //             $newKey = str_replace("T-", "", $key);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'P-') !== false  && $estate !== 'MRE' && $estate !== 'MLE') {
-                //             $newKey = str_replace("P-", "", $key);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'CBI') !== false) {
-                //             $newKey = str_replace("-CBI", "", $key);
-                //             // $newKey = substr($newKey, 0, 1) . '0' . substr($newKey, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strlen($key) === 3 && $estate == 'NBE' && strpos($key, 'D') !== false && $afd !== 'OA' && $afd !== 'OB') {
-                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strlen($key) === 3 && $estate == 'MRE') {
-                //             $newKey = substr($key, 0, 1) . '0' . substr($key, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'P-P') !== false && $estate == 'MRE') {
-                //             $newKey = str_replace("-P", "0", $key);
-                //             unset($plot_kuning[$key][$key]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } elseif (strpos($key, 'P-') !== false && $estate == 'MLE') {
-                //             $keyx = str_replace("P-", "", $key);
-                //             $newKey = substr($keyx, 0, 1) . '0' . substr($keyx, 1);
-                //             unset($plot_kuning[$key][$key2]);
-                //             $plot_kuning[$newKey][$key2] = $value3;
-                //         } else {
-                //             $plot_kuning[$key][$key2] = $value3;
-                //         }
-                //     }
-                // }
-                // $filteredArray = [];
-
-
-
-                // foreach ($plot_kuning as $key => $value) {
-                //     if (!empty($value)) {
-                //         // Add non-empty arrays to the filtered array
-                //         $filteredArray[$key] = $value;
-                //     }
-                // }
 
                 $drawBlok = DB::connection('mysql2')
                     ->table('blok')
@@ -2171,73 +1951,7 @@ class TrackerController extends Controller
                 $drawBlok = $drawBlok->groupBy(['nama']);
                 $drawBlok = json_decode($drawBlok, true);
 
-                // dd($drawBlok, $plot_kuning);
 
-                // foreach ($drawBlok as $key => $value) {
-                //     foreach ($value as $key2 => $value3) {
-                //         $afd = $value3['afd_nama'];
-                //         if (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'A') !== false) {
-                //             $newKey = str_replace("A", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 5 && $estate == 'PDE' && strpos($key2, 'B') !== false) {
-                //             $newKey = str_replace("B", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                //             $newKey = str_replace("T-", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 6 && $estate == 'PDE' && strpos($key2, 'T-A') !== false) {
-                //             $newKey = str_replace("T-", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-N') !== false && $estate == 'SPE'  && $afd !== 'OD') {
-                //             $newKey = str_replace("P-", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate !== 'SPE' && $estate !== 'MLE') {
-                //             $newKey = str_replace("P-", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && $estate == 'SPE'  && $afd == 'OD') {
-                //             $newKey = str_replace("P-", "", $key2);
-                //             $newKey = str_replace("A", "", $newKey);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 7 && $estate == 'MLE' && $afd == 'OC') {
-                //             $kexa = str_replace("P-", "", $key2);
-                //             $newKey = str_replace("B", "", $kexa);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strpos($key2, 'P-') !== false && strlen($key2) === 6 && $estate == 'MLE' && $estate !== 'SCE') {
-                //             $kexa = str_replace("P-", "", $key2);
-                //             // $newKey = str_replace("B", "", $kexa);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 5 && $estate == 'SCE') {
-                //             $newKey = str_replace("B", "", $key2);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } elseif (strlen($key2) === 3 && in_array($estate, ['BDE', 'KTE', 'MKE', 'PKE', 'BHE', 'BSE', 'BWE', 'GDE'])) {
-                //             $newKey = substr($key2, 0, 1) . '0' . substr($key2, 1);
-                //             unset($plotAfd[$key][$key2]);
-                //             $drawBlok[$key][$newKey] = $value3;
-                //         } else {
-                //             $drawBlok[$key][$key2] = $value3;
-                //         }
-                //     }
-                // }
-
-
-                // $filteredBlok = [];
-
-                // foreach ($drawBlok as $key => $value) {
-                //     if (!empty($value)) {
-                //         // Add non-empty arrays to the filtered array
-                //         $filteredBlok[$key] = $value;
-                //     }
-                // }
 
                 asort($plot_kuning);
                 $new_blok = array();
@@ -2257,6 +1971,11 @@ class TrackerController extends Controller
                                     $new_blok[0]['blok'] = $value4['blok'];
                                     $new_blok[0]['kondisi'] = $value4['kondisi'];
                                     $new_blok[0]['status'] = $value4['status'];
+                                    $new_blok[0]['lat'] = $value4['lat'];
+                                    $new_blok[0]['lon'] = $value4['lon'];
+                                    $new_blok[0]['datetime'] = $value4['datetime'];
+                                    $new_blok[0]['petugas'] = $value4['petugas'];
+                                    $new_blok[0]['dosis_pupuk'] = $value4['dosis_pupuk'];
                                 }
                             }
                         }
